@@ -1,0 +1,135 @@
+[
+    {
+        "Rogue": {
+            "Outlaw": [
+                {
+                    "id": 1,
+                    "name": "Dispatch",
+                    "url": "/Outlaw/ability_rogue_waylay.png"
+                },
+                {
+                    "id": 2,
+                    "name": "Ambush",
+                    "url": "/Outlaw/ability_rogue_ambush.png"
+                },
+                {
+                    "id": 3,
+                    "name": "Roll the Bones",
+                    "url": "/Outlaw/ability_rogue_rollthebones.png"
+                },
+                {
+                    "id": 4,
+                    "name": "Roll the Bones: One of a Kind",
+                    "url": "/Outlaw/inv12_ability_rogue_rollthebones_one.png"
+                },
+                {
+                    "id": 5,
+                    "name": "Roll the Bones: Double Trouble",
+                    "url": "/Outlaw/inv12_ability_rogue_rollthebones_two.png"
+                },
+                {
+                    "id": 6,
+                    "name": "Roll the Bones: Triple Threat",
+                    "url": "/Outlaw/inv12_ability_rogue_rollthebones_three.png"
+                },
+                {
+                    "id": 7,
+                    "name": "Roll the Bones: Jackpot",
+                    "url": "/Outlaw/inv12_ability_rogue_rollthebones_jackpot.png"
+                },
+                {
+                    "id": 8,
+                    "name": "Sinister Strike",
+                    "url": "/Outlaw/spell_shadow_ritualofsacrifice.png"
+                },
+                {
+                    "id": 9,
+                    "name": "Adrenaline Rush",
+                    "url": "/Outlaw/spell_shadow_shadowworddominate.png"
+                },
+                {
+                    "id": 10,
+                    "name": "Blade Rush",
+                    "url": "/Outlaw/ability_arakkoa_spinning_blade.png"
+                },
+                {
+                    "id": 11,
+                    "name": "Killing Spree",
+                    "url": "/Outlaw/inv_112_rogue_betweentheeyes.png"
+                },
+                {
+                    "id": 12,
+                    "name": "Between the Eyes",
+                    "url": "/Outlaw/inv_weapon_rifle_01.png"
+                },
+                {
+                    "id": 13,
+                    "name": "Opportunity",
+                    "url": "/Outlaw/ability_rogue_pistolshot.png"
+                },
+                {
+                    "id": 14,
+                    "name": "Preparation",
+                    "url": "/Outlaw/ability_rogue_preparation.png"
+                },
+                {
+                    "id": 15,
+                    "name": "Keep It Rolling",
+                    "url": "/Outlaw/ability_rogue_keepitrolling.png"
+                }
+            ],
+            "Subtlety": [
+                {
+                    "id": 1,
+                    "name": "Shadow Dance",
+                    "url": "/Subtlety/ability_rogue_shadowdance.png"
+                },
+                {
+                    "id": 2,
+                    "name": "Shadowstrike",
+                    "url": "/Subtlety/ability_rogue_shadowstrike.png"
+                },
+                {
+                    "id": 3,
+                    "name": "Eviscerate",
+                    "url": "/Subtlety/ability_rogue_eviscerate.png"
+                },
+                {
+                    "id": 4,
+                    "name": "Shuriken Storm",
+                    "url": "/Subtlety/ability_rogue_shurikenstorm.png"
+                },
+                {
+                    "id": 5,
+                    "name": "Enveloping Shadows",
+                    "url": "/Subtlety/ability_rogue_envelopingshadows.png"
+                },
+                {
+                    "id": 6,
+                    "name": "Dark Shadow",
+                    "url": "/Subtlety/ability_rogue_darkshadow.png"
+                },
+                {
+                    "id": 7,
+                    "name": "Vanish",
+                    "url": "/Subtlety/ability_stealth.png"
+                },
+                {
+                    "id": 8,
+                    "name": "Premeditation",
+                    "url": "/Subtlety/ability_rogue_premeditation.png"
+                },
+                {
+                    "id": 9,
+                    "name": "Shadowstep",
+                    "url": "/Subtlety/ability_rogue_shadowstep.png"
+                },
+                {
+                    "id": 10,
+                    "name": "Master of Shadows",
+                    "url": "/Subtlety/ability_rogue_masterofshadows.png"
+                }
+            ]
+        }
+    }
+]
