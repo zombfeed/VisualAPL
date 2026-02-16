@@ -24,4 +24,5 @@ dist-ssr
 
 /src/assets/*.png
 /src/assets/_*/
+/public/SpellIcons/*
 lower.py
