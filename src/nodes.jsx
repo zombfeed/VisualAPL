@@ -247,7 +247,7 @@ export function ConditionalAbilityNode({ id, data }) {
                 <select onChange={handleChange} value={selectedValue} style={{ minWidth: 160 }}>
                     <option value="">-- select ability --</option>
                     {options.map((opt) => {
-                        if (opt.types.includes("damage")){
+                        if (opt.types.includes("damage")) {
                             return;
                         }
                         const value = JSON.stringify({ url: opt.url, name: opt.name, types: opt.types });
@@ -266,7 +266,15 @@ export function ConditionalAbilityNode({ id, data }) {
                         )}
                     </div>
                     <div style={{ display: 'flex', flexDirection: 'row', gap: 8, marginTop: 8 }}>
-                        Conditions
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 4, marginLeft: 8 }}>
+                            Conditions
+                            <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                                Cooldown Available
+                                <input type="checkbox" label="cooldown" onChange={() => { }} checked={true || false}></input>
+                            </div>
+                            <input id="text" name="rdur" placeholder="Remaining Duration" style={{ width: 120 }} />
+                            <input id="text" name="stacks" placeholder="Stack Count" style={{ width: 120 }} />
+                        </div>
                     </div>
                 </div>
             </div>
