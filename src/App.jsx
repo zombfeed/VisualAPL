@@ -9,16 +9,18 @@ import {
   useReactFlow,
   Background,
   Panel,
-  getConnectedEdges, getIncomers, getOutgoers,
+  getIncomers,
+  getOutgoers,
 } from '@xyflow/react';
 
 import '@xyflow/react/dist/style.css';
 
-import { AbilityNode, APLStartNode, APLEndNode, ConditionalAbilityNode, ConditionalAndNode, ConditoinalOrNode } from './nodes';
+import { AbilityNode, APLStartNode, APLEndNode, ConditionalAbilityNode, ConditionalAndNode, ConditionalOrNode } from './nodes';
 
 import Sidebar from './Sidebar';
 import { DnDProvider, useDnD } from './DnDContext';
-import { NfcIcon } from 'lucide-react';
+
+const MIN_DISTANCE = 150;
 
 const APLKey = 'apl-flow';
 const nodeTypes = {
@@ -26,7 +28,7 @@ const nodeTypes = {
   'apl-start': APLStartNode,
   'apl-end': APLEndNode,
   'conditional-ability': ConditionalAbilityNode,
-  'conditional-or': ConditoinalOrNode,
+  'conditional-or': ConditionalOrNode,
   'conditional-and': ConditionalAndNode,
 };
 
@@ -61,7 +63,7 @@ function constructConditionalString(currentNode, nodeData, edges) {
 function convertToAPL(flow) {
   var apl = ""
   var abilityList = "actions";
-  
+
   var relevant_data = {}
   for (var i = 0; i < flow.nodes.length; i++) {
     relevant_data[flow.nodes[i].id] = {
@@ -119,8 +121,25 @@ function DnDFlow() {
   const { screenToFlowPosition } = useReactFlow();
   const [APLInstance, setAPLInstance] = React.useState(null);
   const [type, setType] = useDnD();
+  const edgeReconnectSuccessful = useRef(true);
 
-  const onConnect = useCallback((params) => setEdges((eds) => addEdge(params, eds)), []);
+  const onConnect = useCallback((params) => setEdges((eds) => addEdge(params, eds)), [setEdges]);
+
+  const onReconnectStart = useCallback(() => {
+    edgeReconnectSuccessful.current = false;
+  }, []);
+
+  const onReconnect = useCallback((oldEdge, newConnection) => {
+    edgeReconnectSuccessful.current = true;
+    setEdges((eds) => reconnectEdge(oldEdge, newConnection, eds));
+  });
+
+  const onReconnectEnd = useCallback((_, edge) => {
+    if (!edgeReconnectSuccessful.current) {
+      setEdges((eds) => eds.filter((e) => e.id !== edge.id));
+    }
+    edgeReconnectSuccessful.current = true;
+  }, []);
 
   const onDragOver = useCallback((event) => {
     event.preventDefault();
@@ -247,6 +266,9 @@ function DnDFlow() {
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
           onNodesDelete={onNodesDelete}
+          onReconnect={onReconnect}
+          onReconnectStart={onReconnectStart}
+          onReconnectEnd={onReconnectEnd}
           onConnect={onConnect}
           onDrop={onDrop}
           onInit={setAPLInstance}

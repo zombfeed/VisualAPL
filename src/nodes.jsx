@@ -1,6 +1,7 @@
 import { Position, Handle, useReactFlow, useUpdateNodeInternals } from '@xyflow/react';
 import { useEffect, useState } from 'react';
 import abilitiesJson from '../public/SpellIcons/abilities.json';
+import LimitHandle from './handles.jsx';
 const iconURL = '/VisualAPL/SpellIcons';
 
 function findAPLStart({ id, data }) {
@@ -150,12 +151,12 @@ export function AbilityNode({ id, data }) {
                         <label style={{ display: 'relative', alignItems: 'center', top: 5 }}>If</label>
                         <input type="checkbox" onChange={toggleHandles} checked={data.hasConditionals || false} />
                     </div>
-                    <Handle type="source" position={Position.Right} id="cond-left-source-handle" style={{ top: '50%' }} className={!data.hasConditionals ? 'handle-hidden' : ''} />
+                    <LimitHandle type="source" position={Position.Right} id="cond-left-source-handle" style={{ top: '50%' }} className={!data.hasConditionals ? 'handle-hidden' : ''} />
                 </div>
             </div>
             {/* </div> */}
-            <Handle type="source" position={Position.Bottom} id="bottom-source-handle" />
-            <Handle type="target" position={Position.Top} id="top-target-handle" />
+            <LimitHandle type="source" position={Position.Bottom} id="bottom-source-handle" />
+            <LimitHandle type="target" position={Position.Top} id="top-target-handle" />
         </div>
     );
 }
@@ -249,21 +250,21 @@ export function ConditionalAbilityNode({ id, data }) {
                     <label style={{ display: 'absolute', alignItems: 'center', top: '5px' }}>If</label>
                     <input type="checkbox" onChange={toggleHandles} checked={data.showHandles || false} />
 
-                    <Handle type="source" position={Position.Right} id="cond-left-source-handle" style={{ position: "absolute", right: "-8px" }} className={!data.showHandles ? 'handle-hidden' : ''} />
+                    <LimitHandle type="source" position={Position.Right} id="cond-left-source-handle" style={{ position: "absolute", right: "-8px" }} className={!data.showHandles ? 'handle-hidden' : ''} />
                 </div> */}
             </div>
-            <Handle type="source" position={Position.Right} id="cond-ability-right-source-handle" />
-            <Handle type="target" position={Position.Left} id="cond-ability-left-target-handle" />
+            <LimitHandle type="source" position={Position.Right} id="cond-ability-right-source-handle" />
+            <LimitHandle type="target" position={Position.Left} id="cond-ability-left-target-handle" />
         </div>
     );
 }
 
-export function ConditoinalOrNode() {
+export function ConditionalOrNode() {
     return (
         <div className="conditional-or-node">
             <label style={{ display: 'absolute', alignItems: 'center', top: '5px' }}>COND: OR</label>
-            <Handle type="target" position={Position.Left} id="cond-left-target-handle" />
-            <Handle type="source" position={Position.Right} id="cond-right-source-handle" />
+            <LimitHandle type="target" position={Position.Left} id="cond-left-target-handle" />
+            <LimitHandle type="source" position={Position.Right} id="cond-right-source-handle" />
         </div>
     );
 }
@@ -272,8 +273,8 @@ export function ConditionalAndNode() {
     return (
         <div className="conditional-and-node">
             <label style={{ display: 'absolute', alignItems: 'center', top: '5px' }}>COND: AND</label>
-            <Handle type="target" position={Position.Left} id="cond-left-target-handle" />
-            <Handle type="source" position={Position.Right} id="cond-right-source-handle" />
+            <LimitHandle type="target" position={Position.Left} id="cond-left-target-handle" />
+            <LimitHandle type="source" position={Position.Right} id="cond-right-source-handle" />
         </div>
     );
 }
@@ -369,7 +370,7 @@ export function APLStartNode({ id, data }) {
                 </select>
             </div>
 
-            <Handle type="source" position={Position.Bottom} id="bottom-source-handle" />
+            <LimitHandle type="source" position={Position.Bottom} id="bottom-source-handle" />
         </div>
     );
 }
@@ -378,7 +379,7 @@ export function APLEndNode() {
     return (
         <div className="apl-end-node">
             End
-            <Handle type="target" position={Position.Top} id="top-target-handle" />
+            <LimitHandle type="target" position={Position.Top} id="top-target-handle" />
         </div>
     );
 }
