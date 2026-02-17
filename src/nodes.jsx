@@ -125,7 +125,6 @@ export function AbilityNode({ id, data }) {
     if (!options.length) {
         options = data?.options || [];
     }
-
     const selectedValue = (selectedImage && selectedName) ? JSON.stringify({ url: selectedImage, name: selectedName, types: selectedTypes }) : '';
 
     return (
@@ -134,6 +133,9 @@ export function AbilityNode({ id, data }) {
                 <select onChange={handleChange} value={selectedValue} style={{ minWidth: 160 }}>
                     <option value="">-- select ability --</option>
                     {options.map((opt) => {
+                        if (!opt.types.includes("damage") && !opt.types.includes("cooldown")) {
+                            return;
+                        }
                         const value = JSON.stringify({ url: opt.url, name: opt.name, types: opt.types });
                         return (
                             <option key={opt.id ?? opt.name} value={value}>{opt.name}</option>
@@ -206,15 +208,28 @@ export function ConditionalAbilityNode({ id, data }) {
 
     const className = startNode?.data?.className;
     const specName = startNode?.data?.specName;
+    const heroName = startNode?.data?.heroName;
 
     let options = [];
-    if (Array.isArray(imagesJson) && imagesJson.length && className && specName) {
+    if (Array.isArray(imagesJson) && imagesJson.length && className && specName && heroName) {
         for (const entry of imagesJson) {
-            if (entry[className] && entry[className][specName]) {
-                options = entry[className][specName].map((it) => {
+            if (entry[className]) {
+                options = entry[className].Abilities.map((it) => {
                     const fullUrl = it.url?.startsWith(iconURL) ? it.url : `${iconURL}${it.url}`;
                     return { ...it, url: fullUrl };
                 });
+            }
+            if (entry[className][specName]) {
+                options.push(...entry[className][specName].map((it) => {
+                    const fullUrl = it.url?.startsWith(iconURL) ? it.url : `${iconURL}${it.url}`;
+                    return { ...it, url: fullUrl };
+                }));
+            }
+            if (entry[className].HeroTalents[heroName]) {
+                options.push(...entry[className].HeroTalents[heroName].map((it) => {
+                    const fullUrl = it.url?.startsWith(iconURL) ? it.url : `${iconURL}${it.url}`;
+                    return { ...it, url: fullUrl };
+                }));
                 break;
             }
         }
@@ -232,26 +247,28 @@ export function ConditionalAbilityNode({ id, data }) {
                 <select onChange={handleChange} value={selectedValue} style={{ minWidth: 160 }}>
                     <option value="">-- select ability --</option>
                     {options.map((opt) => {
+                        if (opt.types.includes("damage")){
+                            return;
+                        }
                         const value = JSON.stringify({ url: opt.url, name: opt.name, types: opt.types });
                         return (
                             <option key={opt.id ?? opt.name} value={value}>{opt.name}</option>
                         );
                     })}
                 </select>
-                <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 8 }}>
-                    {selectedImage && (
-                        <img src={selectedImage} alt={selectedName || 'Selected'} style={{ display: 'block', marginTop: '5px', maxWidth: 64 }} />
-                    )}
-                    {selectedName && (
-                        <div style={{ marginTop: 4, fontSize: 12 }}></div>
-                    )}
+                <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                    <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 8 }}>
+                        {selectedImage && (
+                            <img src={selectedImage} alt={selectedName || 'Selected'} style={{ display: 'block', marginTop: '5px', maxWidth: 64 }} />
+                        )}
+                        {selectedName && (
+                            <div style={{ marginTop: 4, fontSize: 12 }}></div>
+                        )}
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'row', gap: 8, marginTop: 8 }}>
+                        Conditions
+                    </div>
                 </div>
-                {/* <div className='conditional-checkbox' style={{ top: "50%", position: "absolute", right: "8px" }}>
-                    <label style={{ display: 'absolute', alignItems: 'center', top: '5px' }}>If</label>
-                    <input type="checkbox" onChange={toggleHandles} checked={data.showHandles || false} />
-
-                    <LimitHandle type="source" position={Position.Right} id="cond-left-source-handle" style={{ position: "absolute", right: "-8px" }} className={!data.showHandles ? 'handle-hidden' : ''} />
-                </div> */}
             </div>
             <LimitHandle type="source" position={Position.Right} id="cond-ability-right-source-handle" />
             <LimitHandle type="target" position={Position.Left} id="cond-ability-left-target-handle" />
