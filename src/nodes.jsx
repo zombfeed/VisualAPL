@@ -73,7 +73,7 @@ export function AbilityNode({ id, data }) {
             const parsed = JSON.parse(event.target.value || '{}');
             setSelectedImage(parsed.url || '');
             setSelectedName(parsed.name || '');
-            setSelectedTypes(parsed.types ||'');
+            setSelectedTypes(parsed.types || '');
         } catch {
             setSelectedImage(event.target.value || '');
             setSelectedName('');
@@ -94,15 +94,28 @@ export function AbilityNode({ id, data }) {
 
     const className = startNode?.data?.className;
     const specName = startNode?.data?.specName;
+    const heroName = startNode?.data?.heroName;
 
     let options = [];
-    if (Array.isArray(imagesJson) && imagesJson.length && className && specName) {
+    if (Array.isArray(imagesJson) && imagesJson.length && className && specName && heroName) {
         for (const entry of imagesJson) {
-            if (entry[className] && entry[className][specName]) {
-                options = entry[className][specName].map((it) => {
+            if (entry[className]) {
+                options = entry[className].Abilities.map((it) => {
                     const fullUrl = it.url?.startsWith(iconURL) ? it.url : `${iconURL}${it.url}`;
                     return { ...it, url: fullUrl };
                 });
+            }
+            if (entry[className][specName]) {
+                options.push(...entry[className][specName].map((it) => {
+                    const fullUrl = it.url?.startsWith(iconURL) ? it.url : `${iconURL}${it.url}`;
+                    return { ...it, url: fullUrl };
+                }));
+            }
+            if (entry[className].HeroTalents[heroName]) {
+                options.push(...entry[className].HeroTalents[heroName].map((it) => {
+                    const fullUrl = it.url?.startsWith(iconURL) ? it.url : `${iconURL}${it.url}`;
+                    return { ...it, url: fullUrl };
+                }));
                 break;
             }
         }
@@ -133,7 +146,7 @@ export function AbilityNode({ id, data }) {
                     {selectedName && (
                         <div style={{ marginTop: 4, fontSize: 12 }}></div>
                     )}
-                    <div className='conditional-checkbox' style={{position:'fixed', top: "38%", right: "8px", display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
+                    <div className='conditional-checkbox' style={{ position: 'fixed', top: "38%", right: "8px", display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
                         <label style={{ display: 'relative', alignItems: 'center', top: 5 }}>If</label>
                         <input type="checkbox" onChange={toggleHandles} checked={data.hasConditionals || false} />
                     </div>
@@ -268,32 +281,43 @@ export function ConditionalAndNode() {
 export function APLStartNode({ id, data }) {
     const { setNodes } = useReactFlow();
     const [classSpecs, setClassSpecs] = useState({});
+    const [heroTalents, setHeroTalents] = useState({});
     const [classes, setClasses] = useState([]);
     const [className, setClassName] = useState(data?.className || '');
     const [specName, setSpecName] = useState(data?.specName || '');
-
+    const [heroName, setHeroName] = useState(data?.heroName || '');
     useEffect(() => {
         try {
             const json = Array.isArray(abilitiesJson) ? abilitiesJson : [];
-            const mapping = {};
+            const specs = {};
+            const htalents = {};
             const cls = [];
+            const excludedKeys = ['Abilities', 'HeroTalents'];
             for (const entry of json) {
                 const keys = Object.keys(entry);
                 if (!keys.length) continue;
                 const c = keys[0];
-                mapping[c] = Object.keys(entry[c] || {});
+                htalents[c] = Object.keys(entry[c].HeroTalents || {});
+                specs[c] = Object.keys(entry[c] || {}).filter(key => {
+                    return !excludedKeys.includes(key);
+                });;
                 cls.push(c);
             }
-            setClassSpecs(mapping);
-            setClasses(cls);
+            setHeroTalents(htalents);
 
+            setClassSpecs(specs);
+
+            setClasses(cls);
             const defaultClass = data?.className || cls[0] || '';
-            const defaultSpec = data?.specName || (mapping[defaultClass] ? mapping[defaultClass][0] : '');
+            const defaultSpec = data?.specName || (specs[defaultClass] ? specs[defaultClass][0] : '');
+            const defaultHero = data?.heroName || (htalents[defaultClass] ? htalents[defaultClass][0] : '');
             setClassName(defaultClass);
             setSpecName(defaultSpec);
+            setHeroName(defaultHero);
         } catch (e) {
             setClassSpecs({});
             setClasses([]);
+            setHeroTalents({});
         }
     }, [data]);
 
@@ -301,23 +325,27 @@ export function APLStartNode({ id, data }) {
         setNodes((nds) =>
             nds.map((node) => {
                 if (node.id === id) {
-                    return { ...node, data: { ...node.data, className, specName } };
+                    return { ...node, data: { ...node.data, className, specName, heroName } };
                 }
                 return node;
             })
         );
-    }, [className, specName, id, setNodes]);
+    }, [className, specName, heroName, id, setNodes]);
 
     const onClassChange = (e) => {
         const newClass = e.target.value;
         setClassName(newClass);
         const specs = classSpecs[newClass] || [];
         setSpecName(specs[0] || '');
+        const hero = heroTalents[newClass] || [];
+        setHeroName(hero[0] || '');
     };
 
     const onSpecChange = (e) => setSpecName(e.target.value);
+    const onHeroChange = (e) => setHeroName(e.target.value);
 
     const specsForClass = classSpecs[className] || [];
+    const herosForSpec = heroTalents[className] || [];
 
     return (
         <div className="apl-start-node" style={{ display: 'flex', flexDirection: 'column', gap: 6, alignItems: 'center', padding: 8 }}>
@@ -333,6 +361,11 @@ export function APLStartNode({ id, data }) {
                     {specsForClass.length ? specsForClass.map((s) => (
                         <option key={s} value={s}>{s}</option>
                     )) : <option value="">(no specs)</option>}
+                </select>
+                <select value={heroName} onChange={onHeroChange} disabled={!herosForSpec.length}>
+                    {herosForSpec.length ? herosForSpec.map((h) => (
+                        <option key={h} value={h}>{h}</option>
+                    )) : <option value="">(no heroe talents)</option>}
                 </select>
             </div>
 

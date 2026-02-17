@@ -4,127 +4,459 @@
             "Outlaw": [
                 {
                     "name": "Dispatch",
-                    "types": ["damage"],
-                    "url": "/Outlaw/ability_rogue_waylay.png"
+                    "types": [
+                        "damage"
+                    ],
+                    "url": "/Rogue/Outlaw/dispatch.png"
                 },
                 {
                     "name": "Ambush",
-                    "types": ["damage"],
-                    "url": "/Outlaw/ability_rogue_ambush.png"
+                    "types": [
+                        "damage"
+                    ],
+                    "url": "/Rogue/Outlaw/ambush.png"
                 },
                 {
                     "name": "Roll the Bones",
-                    "types": ["buff", "cooldown"],
-                    "url": "/Outlaw/ability_rogue_rollthebones.png"
+                    "types": [
+                        "buff",
+                        "cooldown"
+                    ],
+                    "url": "/Rogue/Outlaw/roll_the_bones.png"
                 },
                 {
                     "name": "Roll the Bones: One of a Kind",
-                    "types": ["buff"],
-                    "url": "/Outlaw/inv12_ability_rogue_rollthebones_one.png"
+                    "types": [
+                        "buff"
+                    ],
+                    "url": "/Rogue/Outlaw/rtb_one_of_a_kind.png"
                 },
                 {
                     "name": "Roll the Bones: Double Trouble",
-                    "types": ["buff"],
-                    "url": "/Outlaw/inv12_ability_rogue_rollthebones_two.png"
+                    "types": [
+                        "buff"
+                    ],
+                    "url": "/Rogue/Outlaw/rtb_double_trouble.png"
                 },
                 {
                     "name": "Roll the Bones: Triple Threat",
-                    "types": ["buff"],
-                    "url": "/Outlaw/inv12_ability_rogue_rollthebones_three.png"
+                    "types": [
+                        "buff"
+                    ],
+                    "url": "/Rogue/Outlaw/rtb_triple_threat.png"
                 },
                 {
                     "name": "Roll the Bones: Jackpot",
-                    "types": ["buff"],
-                    "url": "/Outlaw/inv12_ability_rogue_rollthebones_jackpot.png"
+                    "types": [
+                        "buff"
+                    ],
+                    "url": "/Rogue/Outlaw/rtb_jackpot.png"
                 },
                 {
                     "name": "Sinister Strike",
-                    "types": ["damage"],
-                    "url": "/Outlaw/spell_shadow_ritualofsacrifice.png"
+                    "types": [
+                        "damage"
+                    ],
+                    "url": "/Rogue/Outlaw/sinister_strike.png"
                 },
                 {
                     "name": "Adrenaline Rush",
-                    "types": ["cooldown", "buff"],
-                    "url": "/Outlaw/spell_shadow_shadowworddominate.png"
+                    "types": [
+                        "cooldown",
+                        "buff"
+                    ],
+                    "url": "/Rogue/Outlaw/adrenaline_rush.png"
                 },
                 {
                     "name": "Blade Rush",
-                    "types": ["damage", "cooldown"],
-                    "url": "/Outlaw/ability_arakkoa_spinning_blade.png"
+                    "types": [
+                        "damage",
+                        "cooldown"
+                    ],
+                    "url": "/Rogue/Outlaw/blade_rush.png"
                 },
                 {
                     "name": "Killing Spree",
-                    "types": ["damage", "cooldown"],
-                    "url": "/Outlaw/inv_112_rogue_betweentheeyes.png"
+                    "types": [
+                        "damage",
+                        "cooldown"
+                    ],
+                    "url": "/Rogue/Outlaw/killing_spree.png"
                 },
                 {
                     "name": "Between the Eyes",
-                    "types": ["damage", "cooldown"],
-                    "url": "/Outlaw/inv_weapon_rifle_01.png"
+                    "types": [
+                        "damage",
+                        "cooldown"
+                    ],
+                    "url": "/Rogue/Outlaw/between_the_eyes.png"
                 },
                 {
                     "name": "Opportunity",
-                    "types": ["buff"],
-                    "url": "/Outlaw/ability_rogue_pistolshot.png"
+                    "types": [
+                        "buff"
+                    ],
+                    "url": "/Rogue/Outlaw/pistol_shot.png"
                 },
                 {
                     "name": "Preparation",
-                    "types": ["cooldown"],
-                    "url": "/Outlaw/ability_rogue_preparation.png"
+                    "types": [
+                        "cooldown"
+                    ],
+                    "url": "/Rogue/Outlaw/preparation.png"
                 },
                 {
                     "name": "Keep It Rolling",
-                    "types": ["cooldown"],
-                    "url": "/Outlaw/ability_rogue_keepitrolling.png"
+                    "types": [
+                        "cooldown"
+                    ],
+                    "url": "/Rogue/Outlaw/keep_it_rolling.png"
                 },
                 {
                     "name": "Pistol Shot",
-                    "types": ["damage"],
-                    "url": "/Outlaw/ability_rogue_pistolshot.png"
+                    "types": [
+                        "damage"
+                    ],
+                    "url": "/Rogue/Outlaw/pistol_shot.png"
                 }
             ],
             "Subtlety": [
                 {
+                    "name": "Slice and Dice",
+                    "types": [
+                        "buff"
+                    ],
+                    "url": "/Rogue/slice_and_dice.png"
+                },
+                {
                     "name": "Shadow Dance",
-                    "types": ["buff", "cooldown"],
-                    "url": "/Subtlety/ability_rogue_shadowdance.png"
+                    "types": [
+                        "buff",
+                        "cooldown"
+                    ],
+                    "url": "/Rogue/Subtlety/shadow_dance.png"
                 },
                 {
                     "name": "Shadowstrike",
-                    "types": ["damage"],
-                    "url": "/Subtlety/ability_rogue_shadowstrike.png"
+                    "types": [
+                        "damage"
+                    ],
+                    "url": "/Rogue/Subtlety/shadowstrike.png"
                 },
                 {
                     "name": "Eviscerate",
-                    "types": ["damage"],
-                    "url": "/Subtlety/ability_rogue_eviscerate.png"
+                    "types": [
+                        "damage"
+                    ],
+                    "url": "/Rogue/Subtlety/eviscerate.png"
                 },
                 {
                     "name": "Shuriken Storm",
-                    "types": ["damage"],
-                    "url": "/Subtlety/ability_rogue_shurikenstorm.png"
+                    "types": [
+                        "damage"
+                    ],
+                    "url": "/Rogue/Subtlety/shuriken_storm.png"
                 },
                 {
-                    "name": "Enveloping Shadows",
-                    "types": ["buff"],
-                    "url": "/Subtlety/ability_rogue_envelopingshadows.png"
+                    "name": "Backstab",
+                    "types": [
+                        "damage"
+                    ],
+                    "url": "/Rogue/Subtlety/backstab.png"
                 },
                 {
-                    "name": "Dark Shadow",
-                    "types": ["ability"],
-                    "url": "/Subtlety/ability_rogue_darkshadow.png"
+                    "name": "Black Powder",
+                    "types": [
+                        "damage"
+                    ],
+                    "url": "/Rogue/Subtlety/black_powder.png"
+                },
+                {
+                    "name": "Goremaw's Bite",
+                    "types": [
+                        "damage"
+                    ],
+                    "url": "/Rogue/Subtlety/goremaws_bite.png"
+                },
+                {
+                    "name": "Shuriken Toss",
+                    "types": [
+                        "damage"
+                    ],
+                    "url": "/Rogue/Subtlety/shuriken_toss.png"
+                },
+                {
+                    "name": "Secret Technique",
+                    "types": [
+                        "damage",
+                        "cooldown"
+                    ],
+                    "url": "/Rogue/Subtlety/secret_technique.png"
+                },
+                {
+                    "name": "Shadow Blades",
+                    "types": [
+                        "buff",
+                        "cooldown"
+                    ],
+                    "url": "/Rogue/Subtlety/shadow_blades.png"
+                },
+                {
+                    "name": "Gloomblade",
+                    "types": [
+                        "damage"
+                    ],
+                    "url": "/Rogue/Subtlety/gloomblade.png"
+                },
+                {
+                    "name": "find_weakness",
+                    "types": [
+                        "buff"
+                    ],
+                    "url": "/Rogue/Subtlety/find_weakness.png"
+                }
+            ],
+            "Assassination": [
+                {
+                    "name": "Envenom",
+                    "types": [
+                        "damage"
+                    ],
+                    "url": "/Rogue/Assassination/envenom.png"
+                },
+                {
+                    "name": "Mutilate",
+                    "types": [
+                        "damage"
+                    ],
+                    "url": "/Rogue/Assassination/mutilate.png"
+                },
+                {
+                    "name": "Garrote",
+                    "types": [
+                        "damage"
+                    ],
+                    "url": "/Rogue/Assassination/garrote.png"
+                },
+                {
+                    "name": "Improved Garrote",
+                    "types": [
+                        "damage"
+                    ],
+                    "url": "/Rogue/Assassination/garrote.png"
+                },
+                {
+                    "name": "Rupture",
+                    "types": [
+                        "damage"
+                    ],
+                    "url": "/Rogue/Assassination/rupture.png"
+                },
+                {
+                    "name": "Improved Rupture",
+                    "types": [
+                        "damage"
+                    ],
+                    "url": "/Rogue/Assassination/improved_rupture.png"
+                },
+                {
+                    "name": "Poisoned Knife",
+                    "types": [
+                        "damage"
+                    ],
+                    "url": "/Rogue/Assassination/poisoned_knife.png"
+                },
+                {
+                    "name": "Crimson Tempest",
+                    "types": [
+                        "damage"
+                    ],
+                    "url": "/Rogue/Assassination/crimson_tempest.png"
+                },
+                {
+                    "name": "Kingsbane",
+                    "types": [
+                        "damage",
+                        "cooldown"
+                    ],
+                    "url": "/Rogue/Assassination/kingsbane.png"
+                },
+                {
+                    "name": "Deathmark",
+                    "types": [
+                        "damage",
+                        "cooldown"
+                    ],
+                    "url": "/Rogue/Assassination/deathmark.png"
+                }
+            ],
+            "Abilities": [
+                {
+                    "name": "Slice and Dice",
+                    "types": [
+                        "buff"
+                    ],
+                    "url": "/Rogue/slice_and_dice.png"
                 },
                 {
                     "name": "Vanish",
-                    "types": ["cooldown"],
-                    "url": "/Subtlety/ability_stealth.png"
+                    "types": [
+                        "cooldown"
+                    ],
+                    "url": "/Rogue/vanish.png"
                 },
                 {
-                    "name": "Master of Shadows",
-                    "types": ["buff"],
-                    "url": "/Subtlety/ability_rogue_masterofshadows.png"
+                    "name": "Stealth",
+                    "types": [
+                        "buff"
+                    ],
+                    "url": "/Rogue/stealth.png"
+                },
+                {
+                    "name": "Cloak of Shadows",
+                    "types": [
+                        "buff",
+                        "cooldown"
+                    ],
+                    "url": "/Rogue/cloak_of_shadows.png"
+                },
+                {
+                    "name": "Evasion",
+                    "types": [
+                        "buff",
+                        "cooldown"
+                    ],
+                    "url": "/Rogue/evasion.png"
+                },
+                {
+                    "name": "Feint",
+                    "types": [
+                        "buff",
+                        "cooldown"
+                    ],
+                    "url": "/Rogue/feint.png"
+                },
+                {
+                    "name": "Crippling Poison",
+                    "types": [
+                        "buff"
+                    ],
+                    "url": "/Rogue/crippling_poison.png"
+                },
+                {
+                    "name": "Wound Poison",
+                    "types": [
+                        "buff"
+                    ],
+                    "url": "/Rogue/wound_poison.png"
+                },
+                {
+                    "name": "Instant Poison",
+                    "types": [
+                        "buff"
+                    ],
+                    "url": "/Rogue/instant_poison.png"
+                },
+                {
+                    "name": "Kick",
+                    "types": [
+                        "cooldown"
+                    ],
+                    "url": "/Rogue/kick.png"
+                },
+                {
+                    "name": "Kidney Shot",
+                    "types": [
+                        "cooldown"
+                    ],
+                    "url": "/Rogue/kidney_shot.png"
+                },
+                {
+                    "name": "Supercharger",
+                    "types": [
+                        "buff"
+                    ],
+                    "url": "/Rogue/supercharger.png"
+                },
+                {
+                    "name": "Echoing Reprimand",
+                    "types": [
+                        "buff"
+                    ],
+                    "url": "/Rogue/echoing_reprimand.png"
                 }
-            ]
+            ],
+            "HeroTalents": {
+                "Fatebound": [
+                    {
+                        "name": "Fatebound Coin: Heads",
+                        "types": [
+                            "buff"
+                        ],
+                        "url": "/Rogue/fatebound_heads.png"
+                    },
+                    {
+                        "name": "Fatebound Coin: Tails",
+                        "types": [
+                            "buff"
+                        ],
+                        "url": "/Rogue/fatebound_tails.png"
+                    },
+                    {
+                        "name": "Fatebound Coin: Lucky Coin",
+                        "types": [
+                            "buff"
+                        ],
+                        "url": "/Rogue/fatebound_lucky_coin.png"
+                    }
+                ],
+                "Deathstalker": [
+                    {
+                        "name": "Darkest Night",
+                        "types": [
+                            "buff"
+                        ],
+                        "url": "/Rogue/darkest_night.png"
+                    },
+                    {
+                        "name": "Momentum of Despair",
+                        "types": [
+                            "buff"
+                        ],
+                        "url": "/Rogue/momentum_of_despair.png"
+                    },
+                    {
+                        "name": "Lingering Darkness",
+                        "types": [
+                            "buff"
+                        ],
+                        "url": "/Rogue/lingering_darkness.png"
+                    }
+                ],
+                "Trickster": [
+                    {
+                        "name": "Coup De Grace",
+                        "types": [
+                            "damage"
+                        ],
+                        "url": "/Rogue/coup_de_grace.png"
+                    },
+                    {
+                        "name": "Unseen Blade",
+                        "types": [
+                            "buff"
+                        ],
+                        "url": "/Rogue/unseen_blade.png"
+                    },
+                    {
+                        "name": "Flawless Form",
+                        "types": [
+                            "buff"
+                        ],
+                        "url": "/Rogue/flawless_form.png"
+                    }
+                ]
+            }
         }
     }
 ]
