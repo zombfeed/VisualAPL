@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { useDnD } from './DnDContext';
 import { useReactFlow } from '@xyflow/react';
 import abilitiesJson from '../public/SpellIcons/abilities.json';
-import { Collapse } from '@kunukn/react-collapse';
 
 export default () => {
   const [_, setType] = useDnD();
