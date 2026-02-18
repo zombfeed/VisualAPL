@@ -91,11 +91,9 @@ export function AbilityNode({ id, data }) {
             }));
     }, [selectedImage, selectedName, selectedTypes, id, setNodes]);
 
-    const startNode = findAPLStart({ id, data });
-
-    const className = startNode?.data?.className;
-    const specName = startNode?.data?.specName;
-    const heroName = startNode?.data?.heroName;
+    const className = document.getElementById('class-select')?.value || '';
+    const specName = document.getElementById('spec-select')?.value || '';
+    const heroName = document.getElementById('hero-select')?.value || '';
 
     let options = [];
     if (Array.isArray(imagesJson) && imagesJson.length && className && specName && heroName) {
@@ -142,21 +140,19 @@ export function AbilityNode({ id, data }) {
                         );
                     })}
                 </select>
-                <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 8 }}>
-                    {selectedImage && (
-                        <img src={selectedImage} alt={selectedName || 'Selected'} style={{ display: 'block', marginTop: '5px', maxWidth: 64 }} />
-                    )}
-                    {selectedName && (
-                        <div style={{ marginTop: 4, fontSize: 12 }}></div>
-                    )}
-                    <div className='conditional-checkbox' style={{ position: 'fixed', top: "38%", right: "8px", display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                        <label style={{ display: 'relative', alignItems: 'center', top: 5 }}>If</label>
-                        <input type="checkbox" onChange={toggleHandles} checked={data.hasConditionals || false} />
+                {selectedImage && (
+                    <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                        <img src={selectedImage} alt={selectedName || 'Selected'} style={{ display: 'block', marginTop: '5px', maxWidth: 64, width:'100px' }} />
+                        <div className='conditional-checkbox' style={{ display: 'block', width:'100px'}}>
+                            <label>
+                                <input type="checkbox" onChange={toggleHandles} checked={data.hasConditionals || false} />
+                                <span>Conditions</span>
+                            </label>
+                        </div>
+                        <LimitHandle type="conditional-source" position={Position.Right} id="cond-left-source-handle" style={{ top: '50%' }} className={!data.hasConditionals ? 'handle-hidden' : ''} />
                     </div>
-                    <LimitHandle type="source" position={Position.Right} id="cond-left-source-handle" style={{ top: '50%' }} className={!data.hasConditionals ? 'handle-hidden' : ''} />
-                </div>
+                )}
             </div>
-            {/* </div> */}
             <LimitHandle type="source" position={Position.Bottom} id="bottom-source-handle" />
             <LimitHandle type="target" position={Position.Top} id="top-target-handle" />
         </div>
@@ -206,9 +202,9 @@ export function ConditionalAbilityNode({ id, data }) {
 
     const startNode = findAPLStart({ id, data });
 
-    const className = startNode?.data?.className;
-    const specName = startNode?.data?.specName;
-    const heroName = startNode?.data?.heroName;
+    const className = document.getElementById('class-select')?.value || '';
+    const specName = document.getElementById('spec-select')?.value || '';
+    const heroName = document.getElementById('hero-select')?.value || '';
 
     let options = [];
     if (Array.isArray(imagesJson) && imagesJson.length && className && specName && heroName) {
@@ -256,27 +252,24 @@ export function ConditionalAbilityNode({ id, data }) {
                         );
                     })}
                 </select>
-                <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                    <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 8 }}>
-                        {selectedImage && (
+                {selectedImage && (
+                    <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 8 }}>
                             <img src={selectedImage} alt={selectedName || 'Selected'} style={{ display: 'block', marginTop: '5px', maxWidth: 64 }} />
-                        )}
-                        {selectedName && (
-                            <div style={{ marginTop: 4, fontSize: 12 }}></div>
-                        )}
-                    </div>
-                    <div style={{ display: 'flex', flexDirection: 'row', gap: 8, marginTop: 8 }}>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 4, marginLeft: 8 }}>
-                            Conditions
-                            <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-                                Cooldown Available
-                                <input type="checkbox" label="cooldown" onChange={() => { }} checked={true || false}></input>
+                        </div>
+                        <div style={{ display: 'flex', flexDirection: 'row', gap: 8, marginTop: 8 }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 4, marginLeft: 14, marginRight: 1
+                             }}>
+                                <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                                    Cooldown Available
+                                    <input type="checkbox" label="cooldown" onChange={() => { }} checked={true || false}/>
+                                </div>
+                                <input id="rdur" type="number" name="rdur" placeholder="Remaining Duration" style={{ width: 120 }} />
+                                <input id="stacks" type="number" name="stacks" placeholder="Stack Count" style={{ width: 120 }} />
                             </div>
-                            <input id="text" name="rdur" placeholder="Remaining Duration" style={{ width: 120 }} />
-                            <input id="text" name="stacks" placeholder="Stack Count" style={{ width: 120 }} />
                         </div>
                     </div>
-                </div>
+                )}
             </div>
             <LimitHandle type="source" position={Position.Right} id="cond-ability-right-source-handle" />
             <LimitHandle type="target" position={Position.Left} id="cond-ability-left-target-handle" />
@@ -305,96 +298,11 @@ export function ConditionalAndNode() {
 }
 
 export function APLStartNode({ id, data }) {
-    const { setNodes } = useReactFlow();
-    const [classSpecs, setClassSpecs] = useState({});
-    const [heroTalents, setHeroTalents] = useState({});
-    const [classes, setClasses] = useState([]);
-    const [className, setClassName] = useState(data?.className || '');
-    const [specName, setSpecName] = useState(data?.specName || '');
-    const [heroName, setHeroName] = useState(data?.heroName || '');
-    useEffect(() => {
-        try {
-            const json = Array.isArray(abilitiesJson) ? abilitiesJson : [];
-            const specs = {};
-            const htalents = {};
-            const cls = [];
-            const excludedKeys = ['Abilities', 'HeroTalents'];
-            for (const entry of json) {
-                const keys = Object.keys(entry);
-                if (!keys.length) continue;
-                const c = keys[0];
-                htalents[c] = Object.keys(entry[c].HeroTalents || {});
-                specs[c] = Object.keys(entry[c] || {}).filter(key => {
-                    return !excludedKeys.includes(key);
-                });;
-                cls.push(c);
-            }
-            setHeroTalents(htalents);
 
-            setClassSpecs(specs);
-
-            setClasses(cls);
-            const defaultClass = data?.className || cls[0] || '';
-            const defaultSpec = data?.specName || (specs[defaultClass] ? specs[defaultClass][0] : '');
-            const defaultHero = data?.heroName || (htalents[defaultClass] ? htalents[defaultClass][0] : '');
-            setClassName(defaultClass);
-            setSpecName(defaultSpec);
-            setHeroName(defaultHero);
-        } catch (e) {
-            setClassSpecs({});
-            setClasses([]);
-            setHeroTalents({});
-        }
-    }, [data]);
-
-    useEffect(() => {
-        setNodes((nds) =>
-            nds.map((node) => {
-                if (node.id === id) {
-                    return { ...node, data: { ...node.data, className, specName, heroName } };
-                }
-                return node;
-            })
-        );
-    }, [className, specName, heroName, id, setNodes]);
-
-    const onClassChange = (e) => {
-        const newClass = e.target.value;
-        setClassName(newClass);
-        const specs = classSpecs[newClass] || [];
-        setSpecName(specs[0] || '');
-        const hero = heroTalents[newClass] || [];
-        setHeroName(hero[0] || '');
-    };
-
-    const onSpecChange = (e) => setSpecName(e.target.value);
-    const onHeroChange = (e) => setHeroName(e.target.value);
-
-    const specsForClass = classSpecs[className] || [];
-    const herosForSpec = heroTalents[className] || [];
 
     return (
         <div className="apl-start-node" style={{ display: 'flex', flexDirection: 'column', gap: 6, alignItems: 'center', padding: 8 }}>
             <div>Start</div>
-            <div style={{ display: 'flex', gap: 8 }}>
-                <select value={className} onChange={onClassChange}>
-                    {classes.length ? classes.map((c) => (
-                        <option key={c} value={c}>{c}</option>
-                    )) : <option value="">(no classes)</option>}
-                </select>
-
-                <select value={specName} onChange={onSpecChange} disabled={!specsForClass.length}>
-                    {specsForClass.length ? specsForClass.map((s) => (
-                        <option key={s} value={s}>{s}</option>
-                    )) : <option value="">(no specs)</option>}
-                </select>
-                <select value={heroName} onChange={onHeroChange} disabled={!herosForSpec.length}>
-                    {herosForSpec.length ? herosForSpec.map((h) => (
-                        <option key={h} value={h}>{h}</option>
-                    )) : <option value="">(no heroe talents)</option>}
-                </select>
-            </div>
-
             <LimitHandle type="source" position={Position.Bottom} id="bottom-source-handle" />
         </div>
     );

@@ -35,6 +35,16 @@ const nodeTypes = {
 let id = 0;
 const getId = () => `dndnode_${id++}`;
 
+const initialNodes = [
+  {
+    id: getId(),
+    type: 'apl-start',
+    data: { label: 'APL Start Node' },
+    position: { x: 250, y: 5 },
+  }
+];
+
+
 function constructConditionalString(currentNode, nodeData, edges) {
   var cond = '';
   if (!(currentNode in edges)) return cond;
@@ -116,7 +126,7 @@ function convertToAPL(flow) {
 
 function DnDFlow() {
   const reactFlowWrapper = useRef(null);
-  const [nodes, setNodes, onNodesChange] = useNodesState([]);
+  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const { screenToFlowPosition } = useReactFlow();
   const [APLInstance, setAPLInstance] = React.useState(null);
@@ -243,7 +253,7 @@ function DnDFlow() {
 
   useEffect(() => {
     const handler = (event) => {
-      if (event.key !== 'Delete' && event.key !== 'Backspace') return;
+      if (event.key !== 'Delete') return;
       const allNodes = APLInstance?.getNodes ? APLInstance.getNodes() : nodes;
       const selected = (allNodes || []).filter((n) => n.selected);
       if (selected && selected.length) {
@@ -260,6 +270,7 @@ function DnDFlow() {
       <Sidebar />
       <div className="reactflow-wrapper" ref={reactFlowWrapper} style={{ width: '100vw', height: '100vh' }}>
         <ReactFlow
+          deleteKeyCode={['Delete']}
           nodes={nodes}
           edges={edges}
           nodeTypes={nodeTypes}
