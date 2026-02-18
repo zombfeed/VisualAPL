@@ -3,6 +3,7 @@ import { Handle, useNodeConnections } from "@xyflow/react";
 
 const LimitHandle = (props) => {
     const connections = useNodeConnections({
+        handleId: props.id,
         handleType: props.type,
     });
 

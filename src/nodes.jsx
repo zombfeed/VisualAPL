@@ -1,4 +1,4 @@
-import { Position, Handle, useReactFlow, useUpdateNodeInternals } from '@xyflow/react';
+import { Position, Handle, useReactFlow, useUpdateNodeInternals, useNodeConnections } from '@xyflow/react';
 import { useEffect, useState } from 'react';
 import abilitiesJson from '../public/SpellIcons/abilities.json';
 import LimitHandle from './handles.jsx';
@@ -149,11 +149,11 @@ export function AbilityNode({ id, data }) {
                                 <span>Conditions</span>
                             </label>
                         </div>
-                        <LimitHandle type="conditional-source" position={Position.Right} id="cond-left-source-handle" style={{ top: '50%' }} className={!data.hasConditionals ? 'handle-hidden' : ''} />
+                        <LimitHandle type="source" position={Position.Right} id="cond-right-source-handle" style={{ top: '50%' }} className={!data.hasConditionals ? 'handle-hidden' : ''}/>
                     </div>
                 )}
             </div>
-            <LimitHandle type="source" position={Position.Bottom} id="bottom-source-handle" />
+            <LimitHandle type="source" position={Position.Bottom} id="bottom-source-handle"/>
             <LimitHandle type="target" position={Position.Top} id="top-target-handle" />
         </div>
     );

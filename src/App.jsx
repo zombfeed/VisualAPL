@@ -134,6 +134,35 @@ function DnDFlow() {
   const edgeReconnectSuccessful = useRef(true);
 
   const onConnect = useCallback((params) => setEdges((eds) => addEdge(params, eds)), [setEdges]);
+  const onConnectEnd = useCallback((event, connectionState) => {
+    console.log(connectionState);
+    if (!connectionState.isValid) {
+      const id = getId();
+      const {clientX, clientY} = 'changedTouches' in event ? event.changedTouches[0] : event;
+      var newNode = {};
+      if (connectionState.fromHandle.id === "cond-right-source-handle" || connectionState.fromHandle.id === "cond-ability-right-source-handle") {
+        newNode = {
+          id,
+          type: 'conditional-ability',
+          position: screenToFlowPosition({ x: clientX, y: clientY }),
+          data: { label: 'Conditional', abilityName: 'Condition', types: [] },
+        };
+      }
+      else if (connectionState.fromHandle.id === "bottom-source-handle") {
+        newNode = {
+          id,
+          type: 'ability',
+          position: screenToFlowPosition({ x: clientX, y: clientY }),
+          data: { label: 'Ability', abilityName: 'Ability', hasConditionals: false, types: [] },
+        };
+      }
+      else{
+        return;
+      }
+      setNodes((nds) => nds.concat(newNode));
+      setEdges((eds) => eds.concat({id, source:connectionState.fromNode.id, sourceHandle:connectionState.fromHandle.id, target:id}));
+      }
+  }, [screenToFlowPosition]);
 
   const onReconnectStart = useCallback(() => {
     edgeReconnectSuccessful.current = false;
@@ -150,6 +179,7 @@ function DnDFlow() {
     }
     edgeReconnectSuccessful.current = true;
   }, []);
+
 
   const onDragOver = useCallback((event) => {
     event.preventDefault();
@@ -281,6 +311,7 @@ function DnDFlow() {
           onReconnectStart={onReconnectStart}
           onReconnectEnd={onReconnectEnd}
           onConnect={onConnect}
+          onConnectEnd={onConnectEnd}
           onDrop={onDrop}
           onInit={setAPLInstance}
           onDragStart={onDragStart}
