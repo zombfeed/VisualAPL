@@ -43,61 +43,61 @@ const initialNodes = [
     data: { label: 'APL Start Node' },
     position: { x: 250, y: 5 },
   },
-  {
-    id: getId(),
-    type: 'ability',
-    data: { label: 'Ability Node', abilityName: 'vanish', hasConditionals: true, types: ['cooldown'] },
-    position: { x: 250, y: 200 },
-  },
-  {
-    id: getId(),
-    type: 'conditional-gate',
-    data: { label: 'Conditional Gate Node', operator:'AND' },
-    position: { x: 250, y: 400 },
-  },
-  {
-    id: getId(),
-    type: 'conditional-cooldown',
-    data: { label: 'Conditional Cooldown Node', abilityName: 'vanish',  types: ['cooldown'], },
-    position: { x: 100, y: 600 },
-  },
-  {
-    id: getId(),
-    type: 'conditional-cooldown',
-    data: { label: 'Conditional Cooldown Node', abilityName: 'vanish',  types: ['cooldown'] },
-    position: { x: 400, y: 600 },
-  }
+  // {
+  //   id: getId(),
+  //   type: 'ability',
+  //   data: { label: 'Ability Node', abilityName: 'vanish', hasConditionals: true, types: ['cooldown'] },
+  //   position: { x: 250, y: 200 },
+  // },
+  // {
+  //   id: getId(),
+  //   type: 'conditional-gate',
+  //   data: { label: 'Conditional Gate Node', operator:'AND' },
+  //   position: { x: 250, y: 400 },
+  // },
+  // {
+  //   id: getId(),
+  //   type: 'conditional-cooldown',
+  //   data: { label: 'Conditional Cooldown Node', abilityName: 'vanish',  types: ['cooldown'], },
+  //   position: { x: 100, y: 600 },
+  // },
+  // {
+  //   id: getId(),
+  //   type: 'conditional-cooldown',
+  //   data: { label: 'Conditional Cooldown Node', abilityName: 'vanish',  types: ['cooldown'] },
+  //   position: { x: 400, y: 600 },
+  // }
 ];
 
 const initialEdges = [
-  {
-    id: getId(),
-    source: initialNodes[0].id,
-    sourceHandle: 'bottom-source-handle',
-    target: initialNodes[1].id,
-    targetHandle: 'top-target-handle',
-  },
-  {
-    id: getId(),
-    source: initialNodes[1].id,
-    sourceHandle: 'cond-right-source-handle',
-    target: initialNodes[2].id,
-    targetHandle: 'cond-left-target-handle',
-  },
-  {
-    id: getId(),
-    source: initialNodes[2].id,
-    sourceHandle: `cond-right-source-handle-1`,
-    target: initialNodes[3].id,
-    targetHandle: 'cond-left-target-handle',
-  },
-  {
-    id: getId(),
-    source: initialNodes[2].id,
-    sourceHandle: 'cond-right-source-handle-2',
-    target: initialNodes[4].id,
-    targetHandle: 'cond-left-target-handle',
-  },
+  // {
+  //   id: getId(),
+  //   source: initialNodes[0].id,
+  //   sourceHandle: 'bottom-source-handle',
+  //   target: initialNodes[1].id,
+  //   targetHandle: 'top-target-handle',
+  // },
+  // {
+  //   id: getId(),
+  //   source: initialNodes[1].id,
+  //   sourceHandle: 'cond-right-source-handle',
+  //   target: initialNodes[2].id,
+  //   targetHandle: 'cond-left-target-handle',
+  // },
+  // {
+  //   id: getId(),
+  //   source: initialNodes[2].id,
+  //   sourceHandle: `cond-right-source-handle-1`,
+  //   target: initialNodes[3].id,
+  //   targetHandle: 'cond-left-target-handle',
+  // },
+  // {
+  //   id: getId(),
+  //   source: initialNodes[2].id,
+  //   sourceHandle: 'cond-right-source-handle-2',
+  //   target: initialNodes[4].id,
+  //   targetHandle: 'cond-left-target-handle',
+  // },
 ];
 
 const connectionValidation = (connection) =>{
