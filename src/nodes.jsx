@@ -421,9 +421,9 @@ export function ConditionalGateNode({ id, data }) {
     return (
         <div className="conditional-gate-node">
             <select onChange={handleChange} value={operator} style={{ minWidth: 120 }}>
-                <option value="AND">AND</option>
-                <option value="OR">OR</option>
-                <option value="NOT">NOT</option>
+                <option value="AND">AND Group</option>
+                <option value="OR">OR Group</option>
+                <option value="NOT">NOT Group</option>
             </select>
             <label style={{ display: 'absolute', alignItems: 'center', top: '5px' }}/>
             <LimitHandle type="target" position={Position.Left} id={`cond-left-target-handle`} />
@@ -433,7 +433,7 @@ export function ConditionalGateNode({ id, data }) {
                 style={{ display: 'flex', top: operator === 'NOT' ? '50%' : '25%' }}
                 id={`cond-right-source-handle-1`} />
             
-            <LimitHandle type="source" position={Position.Right} style={{ display: 'flex', top: '75%' }} id={`cond-right-source-handle-2`} className={operator==='NOT' ? 'handle-hidden' : ''}  />
+            <LimitHandle type="source" position={Position.Right} style={{ display: 'flex', top: '75%' }} id={`cond-right-source-handle-2`} className={operator==='NOT' ? 'handle-hidden' : ''}   />
 
         </div>
     );

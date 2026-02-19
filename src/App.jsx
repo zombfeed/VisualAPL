@@ -2,6 +2,7 @@ import React, { useRef, useCallback, useEffect } from 'react';
 import {
   ReactFlow,
   ReactFlowProvider,
+  reconnectEdge,
   addEdge,
   useNodesState,
   useEdgesState,

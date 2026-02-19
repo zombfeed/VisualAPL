@@ -104,7 +104,7 @@ export default () => {
         Conditional Buff Node
       </div>
       <div className="dndnode" onDragStart={(event) => onDragStart(event, "conditional-gate")} draggable>
-        Logic Gate
+        Logic Group
       </div>
     </aside>
   );
