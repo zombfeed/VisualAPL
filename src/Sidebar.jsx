@@ -97,14 +97,14 @@ export default () => {
       <div className="dndnode" onDragStart={(event) => onDragStart(event, 'ability')} draggable>
         Ability Node
       </div>
-      <div className="dndnode" onDragStart={(event) => onDragStart(event, "conditional-ability")} draggable>
-        Conditional Ability Node
+      <div className="dndnode" onDragStart={(event) => onDragStart(event, "conditional-cooldown")} draggable>
+        Conditional Cooldown Node
       </div>
-      <div className="dndnode" onDragStart={(event) => onDragStart(event, "conditional-or")} draggable>
-        OR
+      <div className="dndnode" onDragStart={(event) => onDragStart(event, "conditional-buff")} draggable>
+        Conditional Buff Node
       </div>
-      <div className="dndnode" onDragStart={(event) => onDragStart(event, "conditional-and")} draggable>
-        AND
+      <div className="dndnode" onDragStart={(event) => onDragStart(event, "conditional-gate")} draggable>
+        Logic Gate
       </div>
     </aside>
   );

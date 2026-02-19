@@ -25,34 +25,6 @@
                     "url": "/Rogue/Outlaw/roll_the_bones.png"
                 },
                 {
-                    "name": "Roll the Bones: One of a Kind",
-                    "types": [
-                        "buff"
-                    ],
-                    "url": "/Rogue/Outlaw/rtb_one_of_a_kind.png"
-                },
-                {
-                    "name": "Roll the Bones: Double Trouble",
-                    "types": [
-                        "buff"
-                    ],
-                    "url": "/Rogue/Outlaw/rtb_double_trouble.png"
-                },
-                {
-                    "name": "Roll the Bones: Triple Threat",
-                    "types": [
-                        "buff"
-                    ],
-                    "url": "/Rogue/Outlaw/rtb_triple_threat.png"
-                },
-                {
-                    "name": "Roll the Bones: Jackpot",
-                    "types": [
-                        "buff"
-                    ],
-                    "url": "/Rogue/Outlaw/rtb_jackpot.png"
-                },
-                {
                     "name": "Sinister Strike",
                     "types": [
                         "damage"

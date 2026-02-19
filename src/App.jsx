@@ -15,10 +15,11 @@ import {
 
 import '@xyflow/react/dist/style.css';
 
-import { AbilityNode, APLStartNode, APLEndNode, ConditionalAbilityNode, ConditionalAndNode, ConditionalOrNode } from './nodes';
+import { AbilityNode, APLStartNode, APLEndNode, ConditionalGateNode, ConditionalBuffNode, ConditionalCooldownNode } from './nodes';
 
 import Sidebar from './Sidebar';
 import { DnDProvider, useDnD } from './DnDContext';
+import { convertToAPL } from './aplconverter';
 
 const MIN_DISTANCE = 150;
 
@@ -27,13 +28,13 @@ const nodeTypes = {
   ability: AbilityNode,
   'apl-start': APLStartNode,
   'apl-end': APLEndNode,
-  'conditional-ability': ConditionalAbilityNode,
-  'conditional-or': ConditionalOrNode,
-  'conditional-and': ConditionalAndNode,
+  'conditional-gate': ConditionalGateNode,
+  'conditional-cooldown': ConditionalCooldownNode,
+  'conditional-buff': ConditionalBuffNode,
 };
 
 let id = 0;
-const getId = () => `dndnode_${id++}`;
+export const getId = () => `dndnode_${id++}`;
 
 const initialNodes = [
   {
@@ -41,93 +42,77 @@ const initialNodes = [
     type: 'apl-start',
     data: { label: 'APL Start Node' },
     position: { x: 250, y: 5 },
+  },
+  {
+    id: getId(),
+    type: 'ability',
+    data: { label: 'Ability Node', abilityName: 'vanish', hasConditionals: true, types: ['cooldown'] },
+    position: { x: 250, y: 200 },
+  },
+  {
+    id: getId(),
+    type: 'conditional-gate',
+    data: { label: 'Conditional Gate Node', operator:'AND' },
+    position: { x: 250, y: 400 },
+  },
+  {
+    id: getId(),
+    type: 'conditional-cooldown',
+    data: { label: 'Conditional Cooldown Node', abilityName: 'vanish',  types: ['cooldown'], },
+    position: { x: 100, y: 600 },
+  },
+  {
+    id: getId(),
+    type: 'conditional-cooldown',
+    data: { label: 'Conditional Cooldown Node', abilityName: 'vanish',  types: ['cooldown'] },
+    position: { x: 400, y: 600 },
   }
 ];
 
+const initialEdges = [
+  {
+    id: getId(),
+    source: initialNodes[0].id,
+    sourceHandle: 'bottom-source-handle',
+    target: initialNodes[1].id,
+    targetHandle: 'top-target-handle',
+  },
+  {
+    id: getId(),
+    source: initialNodes[1].id,
+    sourceHandle: 'cond-right-source-handle',
+    target: initialNodes[2].id,
+    targetHandle: 'cond-left-target-handle',
+  },
+  {
+    id: getId(),
+    source: initialNodes[2].id,
+    sourceHandle: `cond-right-source-handle-1`,
+    target: initialNodes[3].id,
+    targetHandle: 'cond-left-target-handle',
+  },
+  {
+    id: getId(),
+    source: initialNodes[2].id,
+    sourceHandle: 'cond-right-source-handle-2',
+    target: initialNodes[4].id,
+    targetHandle: 'cond-left-target-handle',
+  },
+];
 
-function constructConditionalString(currentNode, nodeData, edges) {
-  var cond = '';
-  if (!(currentNode in edges)) return cond;
-  for (var i = 0; i < edges[currentNode].length; i++) {
-    var target = edges[currentNode][i];
-    if (!nodeData[target].type.includes('cond')) {
-      continue;
-    }
-    if (nodeData[target].type === 'conditional-ability') {
-      if (nodeData[target].data.types && nodeData[target].data.types.includes('cooldown')) {
-        cond += `${nodeData[target].data.abilityName.replaceAll(' ', '_')}.ready`;
-      } else if (nodeData[target].data.types && nodeData[target].data.types.includes('buff')) {
-        cond += `${nodeData[target].data.abilityName.replaceAll(' ', '_')}.up`;
-      }
-    } else if (nodeData[target].type == 'conditional-or') {
-      cond += `|`;
-    } else if (nodeData[target].type == 'conditional-and') {
-      cond += `&`;
-    }
-    return cond += constructConditionalString(target, nodeData, edges);
+const connectionValidation = (connection) =>{
+  if (connection.sourceHandle.includes('bottom-source-handle') && connection.targetHandle.includes('top-target-handle')) {
+    return true;
+  } else if (connection.sourceHandle.includes('cond-right-source-handle') && (connection.targetHandle.includes('cond-left-target-handle'))) {
+    return true;
   }
-  return cond;
-
+  return false;
 }
-
-function convertToAPL(flow) {
-  var apl = ""
-  var abilityList = "actions";
-
-  var relevant_data = {}
-  for (var i = 0; i < flow.nodes.length; i++) {
-    relevant_data[flow.nodes[i].id] = {
-      'type': flow.nodes[i].type,
-      'data': Object.fromEntries(Object.entries(flow.nodes[i].data).map(([key, value]) => {
-        if (typeof value === 'string') {
-          return [key, value.toLowerCase()]; ''
-        }
-        return [key, value];
-      }))
-    };
-  }
-
-  var edges = {}
-  for (var i = 0; i < flow.edges.length; i++) {
-    if (!edges[flow.edges[i].source]) {
-      edges[flow.edges[i].source] = [];
-    }
-    edges[flow.edges[i].source].push(flow.edges[i].target);
-  }
-
-
-  for (const edge in edges) {
-    var j = 0;
-    for (var i = 0; i < edges[edge].length; i++) {
-      var target = edges[edge][i];
-      if (relevant_data[edge].type === 'apl-start') {
-        if (relevant_data[target].type === 'ability') {
-          apl += `${abilityList}=${relevant_data[target].data.abilityName.replaceAll(' ', '_')}`;
-          if (relevant_data[target].data.hasConditionals === true) {
-            apl += `,if=`;
-            apl += constructConditionalString(target, relevant_data, edges);
-          }
-        }
-      } else if (relevant_data[target].type === 'ability') {
-        apl += `\n${abilityList}+=/${relevant_data[target].data.abilityName.replaceAll(' ', '_')}`;
-        if (relevant_data[target].data.hasConditionals === true) {
-          apl += `,if=`;
-          apl += constructConditionalString(target, relevant_data, edges);
-        }
-      } else if (relevant_data[target].type === 'apl-end') {
-        abilityList = `\nactions${j}`;
-      }
-    }
-    j++;
-  }
-  return apl;
-}
-
 
 function DnDFlow() {
   const reactFlowWrapper = useRef(null);
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
   const { screenToFlowPosition } = useReactFlow();
   const [APLInstance, setAPLInstance] = React.useState(null);
   const [type, setType] = useDnD();
@@ -135,20 +120,11 @@ function DnDFlow() {
 
   const onConnect = useCallback((params) => setEdges((eds) => addEdge(params, eds)), [setEdges]);
   const onConnectEnd = useCallback((event, connectionState) => {
-    console.log(connectionState);
     if (!connectionState.isValid) {
       const id = getId();
-      const {clientX, clientY} = 'changedTouches' in event ? event.changedTouches[0] : event;
+      const { clientX, clientY } = 'changedTouches' in event ? event.changedTouches[0] : event;
       var newNode = {};
-      if (connectionState.fromHandle.id === "cond-right-source-handle" || connectionState.fromHandle.id === "cond-ability-right-source-handle") {
-        newNode = {
-          id,
-          type: 'conditional-ability',
-          position: screenToFlowPosition({ x: clientX, y: clientY }),
-          data: { label: 'Conditional', abilityName: 'Condition', types: [] },
-        };
-      }
-      else if (connectionState.fromHandle.id === "bottom-source-handle") {
+      if (connectionState.fromHandle.id.includes('bottom-source-handle')) {
         newNode = {
           id,
           type: 'ability',
@@ -156,12 +132,12 @@ function DnDFlow() {
           data: { label: 'Ability', abilityName: 'Ability', hasConditionals: false, types: [] },
         };
       }
-      else{
+      else {
         return;
       }
       setNodes((nds) => nds.concat(newNode));
-      setEdges((eds) => eds.concat({id, source:connectionState.fromNode.id, sourceHandle:connectionState.fromHandle.id, target:id}));
-      }
+      setEdges((eds) => eds.concat({ id, source: connectionState.fromNode.id, sourceHandle: connectionState.fromHandle.id, target: id }));
+    }
   }, [screenToFlowPosition]);
 
   const onReconnectStart = useCallback(() => {
@@ -316,6 +292,7 @@ function DnDFlow() {
           onInit={setAPLInstance}
           onDragStart={onDragStart}
           onDragOver={onDragOver}
+          isValidConnection={connectionValidation}
           fitView
         >
           <Controls />
