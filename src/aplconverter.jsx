@@ -59,7 +59,6 @@ function buildAPL(data, edges, listName = '') {
         var j = 0;
         for (var i = 0; i < edges[edge].length; i++) {
             var target = edges[edge][i];
-            console.log(data[target]);
             if (data[edge].type === listName) {
                 if (data[target].type === 'ability') {
                     apl += addAbility(abilityList, data, edges, target);
@@ -125,10 +124,6 @@ export function convertToAPL(flow) {
             addEdge(edges, flow, relevant_data, i);
         }
     }
-    console.log('Precombat data:', precombat_data);
-    console.log('Relevant data:', relevant_data);
-    console.log('Precombat edges:', pcedges);
-    console.log('Relevant edges:', edges);
     apl += buildAPL(precombat_data, pcedges, 'precombat');
     apl += buildAPL(relevant_data, edges);
 
