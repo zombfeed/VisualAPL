@@ -91,8 +91,8 @@ export default () => {
       <div className="dndnode input" onDragStart={(event) => onDragStart(event, 'apl-start')} draggable>
         APL Start Node
       </div>
-      <div className="dndnode output" onDragStart={(event) => onDragStart(event, 'apl-end')} draggable>
-        End Node
+      <div className='dndnode input' onDragStart={(event) => onDragStart(event, 'precombat')} draggable>
+        Precombat
       </div>
       <div className="dndnode" onDragStart={(event) => onDragStart(event, 'ability')} draggable>
         Ability Node

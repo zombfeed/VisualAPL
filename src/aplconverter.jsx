@@ -24,8 +24,8 @@ export function constructConditionalString(prevNode, currentNode, nodeData, edge
         if (isNot) cond += '!';
         let top = edges[currentNode][0];
         let bottom = edges[currentNode][1];
-  
-        if (prevNode !== null && (nodeData[prevNode].type.includes('cond') )) cond += '(';
+
+        if (prevNode !== null && (nodeData[prevNode].type.includes('cond'))) cond += '(';
         if (top && nodeData[top]?.type.includes('cond')) {
             cond += buildConditionString(nodeData[top]);
             cond += constructConditionalString(currentNode, top, nodeData, edges);
@@ -34,7 +34,7 @@ export function constructConditionalString(prevNode, currentNode, nodeData, edge
             cond += operatorSymbol;
             cond += buildConditionString(nodeData[bottom]);
             cond += constructConditionalString(currentNode, bottom, nodeData, edges);
-            if (prevNode !== null && (nodeData[prevNode].type.includes('cond')  && nodeData[prevNode].data.operator !== "not" && !isNot)) cond += ')';
+            if (prevNode !== null && (nodeData[prevNode].type.includes('cond') && nodeData[prevNode].data.operator !== "not" && !isNot)) cond += ')';
         }
         if (!bottom) cond += ')';
     }
@@ -52,55 +52,85 @@ export function constructConditionalString(prevNode, currentNode, nodeData, edge
     return cond;
 }
 
-export function convertToAPL(flow) {
-    var apl = ""
-    var abilityList = "actions";
-
-    var relevant_data = {}
-    for (var i = 0; i < flow.nodes.length; i++) {
-        relevant_data[flow.nodes[i].id] = {
-            'type': flow.nodes[i].type,
-            'data': Object.fromEntries(Object.entries(flow.nodes[i].data).map(([key, value]) => {
-                if (typeof value === 'string') {
-                    return [key, value.toLowerCase()]; ''
-                }
-                return [key, value];
-            }))
-        };
-    }
-
-    var edges = {}
-    for (var i = 0; i < flow.edges.length; i++) {
-        if (!edges[flow.edges[i].source]) {
-            edges[flow.edges[i].source] = [];
-        }
-        edges[flow.edges[i].source].push(flow.edges[i].target);
-    }
-
-
+function buildAPL(data, edges, listName = '') {
+    var apl = '';
+    var abilityList = listName !== '' ? `actions.${listName}` : 'actions';
     for (const edge in edges) {
         var j = 0;
         for (var i = 0; i < edges[edge].length; i++) {
             var target = edges[edge][i];
-            if (relevant_data[edge].type === 'apl-start') {
-                if (relevant_data[target].type === 'ability') {
-                    apl += `${abilityList}=${relevant_data[target].data.abilityName.replaceAll(' ', '_')}`;
-                    if (relevant_data[target].data.hasConditionals === true) {
-                        apl += `,if=`;
-                        apl += `${constructConditionalString(null, target, relevant_data, edges)}`;
-                    }
+            console.log(data[target]);
+            if (data[edge].type === listName) {
+                if (data[target].type === 'ability') {
+                    apl += addAbility(abilityList, data, edges, target);
                 }
-            } else if (relevant_data[target].type === 'ability') {
-                apl += `\n${abilityList}+=/${relevant_data[target].data.abilityName.replaceAll(' ', '_')}`;
-                if (relevant_data[target].data.hasConditionals === true) {
-                    apl += `,if=`;
-                    apl += `${constructConditionalString(null, target, relevant_data, edges)}`;
-                }
-            } else if (relevant_data[target].type === 'apl-end') {
-                abilityList = `\nactions${j}`;
+            } else if (data[target].type === 'ability') {
+                apl += addAbility(abilityList, data, edges, target);
             }
         }
         j++;
     }
+    if (apl === '') return '';
+    apl += '\n\n';
+    return apl;
+}
+
+
+function insertData(dict, flow, types, idx) {
+    if (!types.includes(flow.nodes[idx].type) || (!(flow.nodes[idx].source in dict) && !types.includes(flow.nodes[idx].type))) return;
+    dict[flow.nodes[idx].id] = {
+        'type': flow.nodes[idx].type,
+        'data': Object.fromEntries(Object.entries(flow.nodes[idx].data).map(([key, value]) => {
+            if (typeof value === 'string') {
+                return [key, value.toLowerCase()]; ''
+            }
+            return [key, value];
+        }))
+    };
+}
+
+function addEdge(dict, flow, data, idx) {
+    if (flow.edges[idx].source in data) {
+        if (!dict[flow.edges[idx].source]) {
+            dict[flow.edges[idx].source] = [];
+        }
+        dict[flow.edges[idx].source].push(flow.edges[idx].target);
+    }
+}
+
+function addAbility(abilityList, data, edges, target) {
+    var apl = `${abilityList}+=/${data[target].data.abilityName.replaceAll(' ', '_')}`;
+    if (data[target].data.hasConditionals === true) {
+        apl += `,if=`;
+        apl += `${constructConditionalString(null, target, data, edges)}`;
+    }
+    return `${apl}\n`;
+}
+
+export function convertToAPL(flow) {
+    var apl = ""
+    var precombat_data = {};
+    var relevant_data = {};
+    const dataTypes = ['apl-start', 'ability', 'conditional-ability', 'conditional-cooldown', 'conditional-buff', 'conditional-gate'];
+    for (var i = 0; i < flow.nodes.length; i++) {
+        insertData(precombat_data, flow, ['precombat', 'ability', 'conditional-ability', 'conditional-cooldown', 'conditional-buff', 'conditional-gate'], i);
+        insertData(relevant_data, flow, dataTypes, i);
+    }
+    var edges = {};
+    var pcedges = {};
+    for (var i = 0; i < flow.edges.length; i++) {
+        if (flow.edges[i].source in precombat_data) {
+            addEdge(pcedges, flow, precombat_data, i)
+        } else {
+            addEdge(edges, flow, relevant_data, i);
+        }
+    }
+    console.log('Precombat data:', precombat_data);
+    console.log('Relevant data:', relevant_data);
+    console.log('Precombat edges:', pcedges);
+    console.log('Relevant edges:', edges);
+    apl += buildAPL(precombat_data, pcedges, 'precombat');
+    apl += buildAPL(relevant_data, edges);
+
     return apl;
 }

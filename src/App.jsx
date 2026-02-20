@@ -16,7 +16,7 @@ import {
 
 import '@xyflow/react/dist/style.css';
 
-import { AbilityNode, APLStartNode, APLEndNode, ConditionalGateNode, ConditionalBuffNode, ConditionalCooldownNode } from './nodes';
+import { AbilityNode, APLStartNode, APLEndNode, ConditionalGateNode, ConditionalBuffNode, ConditionalCooldownNode, PreCombatNode } from './nodes';
 
 import Sidebar from './Sidebar';
 import { DnDProvider, useDnD } from './DnDContext';
@@ -32,6 +32,7 @@ const nodeTypes = {
   'conditional-gate': ConditionalGateNode,
   'conditional-cooldown': ConditionalCooldownNode,
   'conditional-buff': ConditionalBuffNode,
+  'precombat': PreCombatNode,
 };
 
 let id = 0;
@@ -206,9 +207,13 @@ function DnDFlow() {
           data.abilityName = n.data?.abilityName;
           data.conditional = n.data?.hasConditionals;
           data.types = n.data?.types;
-        } else if (n.type === 'conditional-ability') {
+        } else if (n.type === 'conditional-cooldown' || n.type === 'conditional-buff') {
           data.abilityName = n.data?.abilityName;
           data.types = n.data?.types;
+        } else if (n.type === 'conditional-gate') {
+          data.operator = n.data?.operator;
+        } else if (n.type === 'precombat') {
+          data.precombat = n.data?.precombat;
         }
         return { ...n, data };
       });

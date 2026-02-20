@@ -6,42 +6,6 @@ import LimitHandle from './handles.jsx';
 
 const iconURL = '/VisualAPL/SpellIcons';
 
-
-function findAPLStart({ id, data }) {
-    const { getNodes, getEdges } = useReactFlow();
-    const nodesAll = typeof getNodes === 'function' ? getNodes() : [];
-    const edgesAll = typeof getEdges === 'function' ? getEdges() : [];
-
-    const nodeById = {};
-    nodesAll.forEach(n => { nodeById[n.id] = n; });
-
-    const parentsMap = {};
-    edgesAll.forEach(e => {
-        if (!parentsMap[e.target]) parentsMap[e.target] = [];
-        parentsMap[e.target].push(e.source);
-    });
-
-    const findUpstreamStart = (startId) => {
-        const visited = new Set();
-        const queue = [startId];
-        while (queue.length) {
-            const current = queue.shift();
-            if (visited.has(current)) continue;
-            visited.add(current);
-            const node = nodeById[current];
-            if (node && node.type === 'apl-start') return node;
-            const parents = parentsMap[current] || [];
-            for (const p of parents) {
-                if (!visited.has(p)) queue.push(p);
-            }
-        }
-        return null;
-    };
-
-    const startNode = findUpstreamStart(id);
-    return startNode;
-}
-
 export function AbilityNode({ id, data }) {
     const { setNodes } = useReactFlow();
     const [imagesJson, setImages] = useState([]);
@@ -199,8 +163,6 @@ export function ConditionalCooldownNode({ id, data }) {
             }));
     }, [selectedImage, selectedName, selectedTypes, id, setNodes]);
 
-    const startNode = findAPLStart({ id, data });
-
     const className = document.getElementById('class-select')?.value || '';
     const specName = document.getElementById('spec-select')?.value || '';
     const heroName = document.getElementById('hero-select')?.value || '';
@@ -314,7 +276,6 @@ export function ConditionalBuffNode({ id, data }) {
             }));
     }, [selectedImage, selectedName, selectedTypes, id, setNodes]);
 
-    const startNode = findAPLStart({ id, data });
 
     const className = document.getElementById('class-select')?.value || '';
     const specName = document.getElementById('spec-select')?.value || '';
@@ -443,6 +404,15 @@ export function APLStartNode({ id, data }) {
     return (
         <div className="apl-start-node" style={{ display: 'flex', flexDirection: 'column', gap: 6, alignItems: 'center', padding: 8 }}>
             <div>Start</div>
+            <LimitHandle type="source" position={Position.Bottom} id="bottom-source-handle" />
+        </div>
+    );
+}
+
+export function PreCombatNode(){
+    return(
+        <div className="apl-start-node" style={{ display: 'flex', flexDirection: 'column', gap: 6, alignItems: 'center', padding: 8 }}>
+            <div>Pre-Combat</div>
             <LimitHandle type="source" position={Position.Bottom} id="bottom-source-handle" />
         </div>
     );
