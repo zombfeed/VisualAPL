@@ -1,10 +1,47 @@
-import { Position, Handle, useReactFlow, useUpdateNodeInternals, useNodeConnections } from '@xyflow/react';
+import { Position, Handle, useReactFlow, useUpdateNodeInternals } from '@xyflow/react';
 import { useEffect, useState } from 'react';
 import abilitiesJson from '../public/SpellIcons/abilities.json';
 import LimitHandle from './handles.jsx';
 
 
 const iconURL = '/VisualAPL/SpellIcons';
+const initNodes = ['apl-start', 'precombat'];
+
+function findInitialNode({ id, data }) {
+    const { getNodes, getEdges } = useReactFlow();
+    const nodesAll = typeof getNodes === 'function' ? getNodes() : [];
+    const edgesAll = typeof getEdges === 'function' ? getEdges() : [];
+
+    const nodeById = {};
+    nodesAll.forEach(n => { nodeById[n.id] = n; });
+
+    const parentsMap = {};
+    edgesAll.forEach(e => {
+        if (!parentsMap[e.target]) parentsMap[e.target] = [];
+        parentsMap[e.target].push(e.source);
+    });
+
+    const findUpstreamStart = (startId) => {
+        const visited = new Set();
+        const queue = [startId];
+        while (queue.length) {
+            const current = queue.shift();
+            if (visited.has(current)) continue;
+            visited.add(current);
+            const node = nodeById[current];
+            if (node && initNodes.includes(node.type)) return node.type;
+            const parents = parentsMap[current] || [];
+            for (const p of parents) {
+                if (!visited.has(p)) queue.push(p);
+            }
+        }
+        return null;
+    };
+
+    const startNode = findUpstreamStart(id);
+    return startNode;
+}
+
 
 export function AbilityNode({ id, data }) {
     const { setNodes } = useReactFlow();
@@ -32,6 +69,7 @@ export function AbilityNode({ id, data }) {
         try {
             setImages(Array.isArray(abilitiesJson) ? abilitiesJson : []);
         } catch (e) {
+            console.log('Error loading abilities.json:', e);
             setImages([]);
         }
     }, []);
@@ -48,15 +86,17 @@ export function AbilityNode({ id, data }) {
         }
     };
 
+    const initNode = findInitialNode({ id, data });
     useEffect(() => {
         setNodes((nds) =>
             nds.map((node) => {
                 if (node.id === id) {
-                    return { ...node, data: { ...node.data, abilityName: selectedName, types: selectedTypes } };
+                    const newData = { ...node.data, abilityName: selectedName, types: selectedTypes, initNode: initNode };
+                    return { ...node, data: newData };
                 }
                 return node;
             }));
-    }, [selectedImage, selectedName, selectedTypes, id, setNodes]);
+    }, [selectedImage, selectedName, selectedTypes, id, setNodes, initNode]);
 
     const className = document.getElementById('class-select')?.value || '';
     const specName = document.getElementById('spec-select')?.value || '';
@@ -137,6 +177,7 @@ export function ConditionalCooldownNode({ id, data }) {
         try {
             setImages(Array.isArray(abilitiesJson) ? abilitiesJson : []);
         } catch (e) {
+            console.log('Error loading abilities.json:', e);
             setImages([]);
         }
     }, []);
@@ -153,15 +194,17 @@ export function ConditionalCooldownNode({ id, data }) {
         }
     };
 
+    const initNode = findInitialNode({ id, data });
     useEffect(() => {
         setNodes((nds) =>
             nds.map((node) => {
                 if (node.id === id) {
-                    return { ...node, data: { ...node.data, abilityName: selectedName, types: selectedTypes } };
+                    const newData = { ...node.data, abilityName: selectedName, types: selectedTypes, initNode: initNode };
+                    return { ...node, data: newData };
                 }
                 return node;
             }));
-    }, [selectedImage, selectedName, selectedTypes, id, setNodes]);
+    }, [selectedImage, selectedName, selectedTypes, id, setNodes, initNode]);
 
     const className = document.getElementById('class-select')?.value || '';
     const specName = document.getElementById('spec-select')?.value || '';
@@ -250,6 +293,7 @@ export function ConditionalBuffNode({ id, data }) {
         try {
             setImages(Array.isArray(abilitiesJson) ? abilitiesJson : []);
         } catch (e) {
+            console.log('Error loading abilities.json:', e);
             setImages([]);
         }
     }, []);
@@ -266,16 +310,17 @@ export function ConditionalBuffNode({ id, data }) {
         }
     };
 
+    const initNode = findInitialNode({ id, data });
     useEffect(() => {
         setNodes((nds) =>
             nds.map((node) => {
                 if (node.id === id) {
-                    return { ...node, data: { ...node.data, abilityName: selectedName, types: selectedTypes } };
+                    const newData = { ...node.data, abilityName: selectedName, types: selectedTypes, initNode: initNode };
+                    return { ...node, data: newData };
                 }
                 return node;
             }));
-    }, [selectedImage, selectedName, selectedTypes, id, setNodes]);
-
+    }, [selectedImage, selectedName, selectedTypes, id, setNodes, initNode]);
 
     const className = document.getElementById('class-select')?.value || '';
     const specName = document.getElementById('spec-select')?.value || '';
@@ -375,7 +420,7 @@ export function ConditionalGateNode({ id, data }) {
 
     const handleChange = (event) => {
         setOperator(event.target.value || 'AND');
-        
+
         updateNodeInternals(id);
     };
 
@@ -386,21 +431,21 @@ export function ConditionalGateNode({ id, data }) {
                 <option value="OR">OR Group</option>
                 <option value="NOT">NOT Group</option>
             </select>
-            <label style={{ display: 'absolute', alignItems: 'center', top: '5px' }}/>
+            <label style={{ display: 'absolute', alignItems: 'center', top: '5px' }} />
             <LimitHandle type="target" position={Position.Left} id={`cond-left-target-handle`} />
             <LimitHandle
                 type="source"
                 position={Position.Right}
                 style={{ display: 'flex', top: operator === 'NOT' ? '50%' : '25%' }}
                 id={`cond-right-source-handle-1`} />
-            
-            <LimitHandle type="source" position={Position.Right} style={{ display: 'flex', top: '75%' }} id={`cond-right-source-handle-2`} className={operator==='NOT' ? 'handle-hidden' : ''}   />
+
+            <LimitHandle type="source" position={Position.Right} style={{ display: 'flex', top: '75%' }} id={`cond-right-source-handle-2`} className={operator === 'NOT' ? 'handle-hidden' : ''} />
 
         </div>
     );
 }
 
-export function APLStartNode({ id, data }) {
+export function APLStartNode() {
     return (
         <div className="apl-start-node" style={{ display: 'flex', flexDirection: 'column', gap: 6, alignItems: 'center', padding: 8 }}>
             <div>Start</div>
@@ -409,8 +454,8 @@ export function APLStartNode({ id, data }) {
     );
 }
 
-export function PreCombatNode(){
-    return(
+export function PreCombatNode() {
+    return (
         <div className="apl-start-node" style={{ display: 'flex', flexDirection: 'column', gap: 6, alignItems: 'center', padding: 8 }}>
             <div>Pre-Combat</div>
             <LimitHandle type="source" position={Position.Bottom} id="bottom-source-handle" />

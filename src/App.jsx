@@ -130,7 +130,7 @@ function DnDFlow() {
         newNode = {
           id,
           type: 'ability',
-          position: screenToFlowPosition({ x: clientX, y: clientY }),
+          position: screenToFlowPosition({ x: clientX-175, y: clientY }),
           data: { label: 'Ability', abilityName: 'Ability', hasConditionals: false, types: [] },
         };
       }
@@ -194,32 +194,10 @@ function DnDFlow() {
     event.dataTransfer.effectAllowed = 'move';
   };
 
-  const onSave = useCallback(() => {
+  const onExport = useCallback(() => {
     if (APLInstance) {
       const flow = APLInstance.toObject();
 
-      const prunedNodes = (nodes || []).map((n) => {
-        const data = {};
-        if (n.type === 'apl-start') {
-          data.className = n.data?.className;
-          data.specName = n.data?.specName;
-        } else if (n.type === 'ability') {
-          data.abilityName = n.data?.abilityName;
-          data.conditional = n.data?.hasConditionals;
-          data.types = n.data?.types;
-        } else if (n.type === 'conditional-cooldown' || n.type === 'conditional-buff') {
-          data.abilityName = n.data?.abilityName;
-          data.types = n.data?.types;
-        } else if (n.type === 'conditional-gate') {
-          data.operator = n.data?.operator;
-        } else if (n.type === 'precombat') {
-          data.precombat = n.data?.precombat;
-        }
-        return { ...n, data };
-      });
-
-      const fullFlow = { ...flow, nodes: prunedNodes, edges: edges || [] };
-      const json = JSON.stringify(fullFlow, null, 2);
       const aplfile = convertToAPL(flow);
       localStorage.setItem(APLKey, aplfile);
 
@@ -234,7 +212,7 @@ function DnDFlow() {
       a.remove();
       URL.revokeObjectURL(url);
     }
-  }, [APLInstance, nodes, edges]);
+  }, [APLInstance]);
 
   const onNodesDelete = useCallback((deleted) => {
     if (!deleted || deleted.length === 0) return;
@@ -301,10 +279,9 @@ function DnDFlow() {
           isValidConnection={connectionValidation}
           fitView
         >
-          <Controls />
           <Background />
           <Panel position="top-right">
-            <button className="xy-theme__button" onClick={onSave}>save</button>
+            <button className="xy-theme__button" onClick={onExport}>Export</button>
           </Panel>
         </ReactFlow>
       </div>
