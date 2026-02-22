@@ -1,3 +1,5 @@
+import { nodeTypes } from './App.jsx';
+
 
 function buildConditionString(nodeData) {
     const node = nodeData.data;
@@ -103,6 +105,7 @@ export function convertToAPL(flow) {
     var apl = ""
     var precombat_data = {};
     var apl_start_data = {};
+    var custom_list_data = {};
 
     // Split nodes based on initial node type
     for (var i = 0; i < flow.nodes.length; i++) {
@@ -115,27 +118,50 @@ export function convertToAPL(flow) {
                 return [key, value];
             }))
         };
-
         if (flow.nodes[i].data.initNode === 'precombat' || flow.nodes[i].type === 'precombat') {
             precombat_data[flow.nodes[i].id] = nodeData;
         } else if (flow.nodes[i].data.initNode === 'apl-start' || flow.nodes[i].type === 'apl-start') {
             apl_start_data[flow.nodes[i].id] = nodeData;
         }
+        else {
+            if (!(flow.nodes[i].data.initNode in nodeTypes) && !(flow.nodes[i].type in nodeTypes)) {
+                if (!(flow.nodes[i].type in custom_list_data)) {
+                    custom_list_data[flow.nodes[i].type] = {};
+                }
+                custom_list_data[flow.nodes[i].type][flow.nodes[i].id] = nodeData;
+            }
+            if (flow.nodes[i].data.initNode in custom_list_data) {
+                custom_list_data[flow.nodes[i].data.initNode][flow.nodes[i].id] = nodeData;
+            }
+        }
     }
 
     var pcedges = {};
     var aplstartedges = {};
+    var customedges = {};
 
     for (i = 0; i < flow.edges.length; i++) {
         if (flow.edges[i].source in precombat_data) {
             addEdge(pcedges, flow, precombat_data, i);
-        } else {
+        } else if (flow.edges[i].source in apl_start_data) {
             addEdge(aplstartedges, flow, apl_start_data, i);
+        } else {
+            for (const clist in custom_list_data) {
+                if (flow.edges[i].source in custom_list_data[clist]) {
+                    if (!(clist in customedges)){
+                        customedges[clist] = {};
+                    }
+                    addEdge(customedges[clist], flow, custom_list_data[clist], i);
+                }
+            }
+            if (flow.edges[i].source in custom_list_data) { continue; }
         }
     }
-
     apl += buildAPL(precombat_data, pcedges, 'precombat');
     apl += buildAPL(apl_start_data, aplstartedges);
+    for( const clist in custom_list_data){
+        apl += buildAPL(custom_list_data[clist], customedges[clist], clist);
+    }
 
     return apl;
 }

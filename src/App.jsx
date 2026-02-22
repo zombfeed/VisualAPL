@@ -16,7 +16,16 @@ import {
 
 import '@xyflow/react/dist/style.css';
 
-import { AbilityNode, APLStartNode, APLEndNode, ConditionalGateNode, ConditionalBuffNode, ConditionalCooldownNode, PreCombatNode } from './nodes';
+import {
+  AbilityNode,
+  APLStartNode,
+  APLEndNode,
+  ConditionalGateNode,
+  ConditionalBuffNode,
+  ConditionalCooldownNode,
+  PreCombatNode,
+  CustomListNode
+} from './nodes';
 
 import Sidebar from './Sidebar';
 import { DnDProvider, useDnD } from './DnDContext';
@@ -25,14 +34,15 @@ import { convertToAPL } from './aplconverter';
 const MIN_DISTANCE = 150;
 
 const APLKey = 'apl-flow';
-const nodeTypes = {
-  ability: AbilityNode,
+export const nodeTypes = {
+  default: CustomListNode,
+  'precombat': PreCombatNode,
   'apl-start': APLStartNode,
   'apl-end': APLEndNode,
+  'ability': AbilityNode,
   'conditional-gate': ConditionalGateNode,
   'conditional-cooldown': ConditionalCooldownNode,
   'conditional-buff': ConditionalBuffNode,
-  'precombat': PreCombatNode,
 };
 
 let id = 0;
@@ -102,7 +112,7 @@ const initialEdges = [
   // },
 ];
 
-const connectionValidation = (connection) =>{
+const connectionValidation = (connection) => {
   if (connection.sourceHandle.includes('bottom-source-handle') && connection.targetHandle.includes('top-target-handle')) {
     return true;
   } else if (connection.sourceHandle.includes('cond-right-source-handle') && (connection.targetHandle.includes('cond-left-target-handle'))) {
@@ -110,6 +120,10 @@ const connectionValidation = (connection) =>{
   }
   return false;
 }
+
+const onError = (id) => {
+  if (id == '002') return;
+};
 
 function DnDFlow() {
   const reactFlowWrapper = useRef(null);
@@ -130,7 +144,7 @@ function DnDFlow() {
         newNode = {
           id,
           type: 'ability',
-          position: screenToFlowPosition({ x: clientX-175, y: clientY }),
+          position: screenToFlowPosition({ x: clientX - 175, y: clientY }),
           data: { label: 'Ability', abilityName: 'Ability', hasConditionals: false, types: [] },
         };
       }
@@ -276,6 +290,7 @@ function DnDFlow() {
           onInit={setAPLInstance}
           onDragStart={onDragStart}
           onDragOver={onDragOver}
+          onError={onError}
           isValidConnection={connectionValidation}
           fitView
         >

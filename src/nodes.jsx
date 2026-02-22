@@ -1,12 +1,16 @@
 import { Position, Handle, useReactFlow, useUpdateNodeInternals } from '@xyflow/react';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import abilitiesJson from '../public/SpellIcons/abilities.json';
 import LimitHandle from './handles.jsx';
 
-
 const iconURL = '/VisualAPL/SpellIcons';
-const initNodes = ['apl-start', 'precombat'];
-
+const excludeTypes = [
+    'conditional-cooldown',
+    'ability',
+    'conditional-buff',
+    'conditional-gate',
+    'apl-end'
+];
 function findInitialNode({ id, data }) {
     const { getNodes, getEdges } = useReactFlow();
     const nodesAll = typeof getNodes === 'function' ? getNodes() : [];
@@ -29,7 +33,7 @@ function findInitialNode({ id, data }) {
             if (visited.has(current)) continue;
             visited.add(current);
             const node = nodeById[current];
-            if (node && initNodes.includes(node.type)) return node.type;
+            if (node && !excludeTypes.includes(node.type)) return node.type;
             const parents = parentsMap[current] || [];
             for (const p of parents) {
                 if (!visited.has(p)) queue.push(p);
@@ -470,4 +474,28 @@ export function APLEndNode() {
             <LimitHandle type="target" position={Position.Top} id="top-target-handle" />
         </div>
     );
+}
+
+export function CustomListNode({ id, data }) {
+    const { setNodes } = useReactFlow();
+
+    const onChange = useCallback((evt) => {
+        const newValue = evt.target.value;
+        setNodes((nds) =>
+            nds.map((node) => {
+                if (node.id === id) {
+                    return { ...node, type: newValue, data: { ...node.data, value: newValue } };
+                }
+                return node;
+            })
+        );
+    }, [id, setNodes]);
+
+    return (
+        <div className="custom-list-node" style={{ display: 'flex', flexDirection: 'column', gap: 6, alignItems: 'center', padding: 8 }}>
+            Custom List Node
+            <input type='text' placeholder='List Name' value={data?.value || ''} onChange={onChange} style={{ width: '100px' }} />
+            <LimitHandle type="source" position={Position.Bottom} id="bottom-source-handle" />
+        </div>
+    )
 }
