@@ -156,7 +156,6 @@ export function convertToAPL(flow) {
                 return [key, value];
             }))
         };
-        console.log(nodeData);
         if (flow.nodes[i].data.initNode === 'precombat' || flow.nodes[i].type === 'precombat') {
             precombat_data[flow.nodes[i].id] = nodeData;
         } else if (flow.nodes[i].data.initNode === 'apl-start' || flow.nodes[i].type === 'apl-start') {
