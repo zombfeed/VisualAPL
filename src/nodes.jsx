@@ -2,6 +2,7 @@ import { Position, Handle, useReactFlow, useUpdateNodeInternals } from '@xyflow/
 import { useEffect, useState, useCallback } from 'react';
 import abilitiesJson from '../public/SpellIcons/abilities.json';
 import LimitHandle from './handles.jsx';
+import { getId } from './App.jsx';
 
 const iconURL = '/VisualAPL/SpellIcons';
 const excludeTypes = [
@@ -9,7 +10,10 @@ const excludeTypes = [
     'ability',
     'conditional-buff',
     'conditional-gate',
-    'apl-end'
+    'apl-end',
+    'customlist-ref',
+    'variable',
+    'variable-ref'
 ];
 function findInitialNode({ id, data }) {
     const { getNodes, getEdges } = useReactFlow();
@@ -408,7 +412,7 @@ export function ConditionalGateNode({ id, data }) {
     const [operator, setOperator] = useState(initial);
     const updateNodeInternals = useUpdateNodeInternals();
     const initNode = findInitialNode({ id, data });
-   
+
     useEffect(() => {
         setNodes((nds) => nds.map((node) => {
             if (node.id === id) {
@@ -478,8 +482,7 @@ export function APLEndNode() {
 }
 
 export function CustomListNode({ id, data }) {
-    const { setNodes } = useReactFlow();
-
+    const { setNodes, getNodes } = useReactFlow();
     const onChange = useCallback((evt) => {
         const newValue = evt.target.value;
         setNodes((nds) =>
@@ -492,11 +495,171 @@ export function CustomListNode({ id, data }) {
         );
     }, [id, setNodes]);
 
+    const onGenerateNode = useCallback(() => {
+        const inputValue = data?.value || 'New Node';
+        if (!inputValue.trim()) {
+            alert('Please enter a name in the List Name field');
+            return;
+        }
+
+        const newNodeId = getId();
+        const currentNode = getNodes().find(n => n.id === id);
+
+        if (!currentNode) return;
+
+        const newNode = {
+            id: newNodeId,
+            type: 'customlist-ref',
+            data: { label: inputValue, value: inputValue },
+            position: {
+                x: currentNode.position.x,
+                y: currentNode.position.y + 150
+            }
+        };
+
+        setNodes((nds) => [...nds, newNode]);
+    }, [id, data?.value, getNodes, setNodes]);
+
     return (
         <div className="custom-list-node" style={{ display: 'flex', flexDirection: 'column', gap: 6, alignItems: 'center', padding: 8 }}>
             Custom List Node
             <input type='text' placeholder='List Name' value={data?.value || ''} onChange={onChange} style={{ width: '100px' }} />
+            <button onClick={onGenerateNode} style={{ padding: '2px 6px', fontSize: '12px' }}>Generate Ref</button>
             <LimitHandle type="source" position={Position.Bottom} id="bottom-source-handle" />
+        </div>
+    )
+}
+
+export function CustomListReferenceNode({ id, data }) {
+    const { setNodes } = useReactFlow();
+    const updateNodeInternals = useUpdateNodeInternals();
+
+    const toggleHandles = (event) => {
+        const checked = event.target.checked;
+        setNodes((nds) =>
+            nds.map((node) => {
+                if (node.id === id) {
+                    const newData = { ...node.data, hasConditionals: checked };
+                    return { ...node, data: newData };
+                }
+                return node;
+            })
+        );
+        updateNodeInternals(id);
+    };
+
+    const initNode = findInitialNode({ id, data });
+    useEffect(() => {
+        setNodes((nds) =>
+            nds.map((node) => {
+                if (node.id === id) {
+                    const newData = { ...node.data, initNode: initNode };
+                    return { ...node, data: newData };
+                }
+                return node;
+            }));
+    }, [id, setNodes, initNode]);
+
+    return (
+        <div className="custom-list-ref-node" style={{ display: 'flex', flexDirection: 'row', gap: 6, alignItems: 'center', padding: 8 }}>
+            <label style={{ display: 'block', width: '50px', marginRight: 10 }}>{data?.value || 'List Reference'}</label>
+            <div className='conditional-checkbox' style={{ display: 'block', width: '100px' }}>
+                <label>
+                    <input type="checkbox" onChange={toggleHandles} checked={data.hasConditionals || false} />
+                    <span>Conditions</span>
+                </label>
+            </div>
+            <LimitHandle type="source" position={Position.Right} id="cond-right-source-handle" style={{ top: '50%' }} className={!data.hasConditionals ? 'handle-hidden' : ''} />
+            <LimitHandle type="source" position={Position.Bottom} id="top-source-handle" />
+            <LimitHandle type="target" position={Position.Top} id="top-target-handle" />
+        </div>
+    )
+}
+
+export function VariableNode({ id, data }) {
+    const { setNodes, getNodes } = useReactFlow();
+    const initNode = findInitialNode({ id, data });
+
+    useEffect(() => {
+        setNodes((nds) =>
+            nds.map((node) => {
+                if (node.id === id) {
+                    const newData = { ...node.data, initNode: initNode };
+                    return { ...node, data: newData };
+                }
+                return node;
+            }));
+    }, [id, setNodes, initNode]);
+
+    const onChange = useCallback((evt) => {
+        const newValue = evt.target.value;
+        setNodes((nds) =>
+            nds.map((node) => {
+                if (node.id === id) {
+                    return { ...node, data: { ...node.data, value: newValue } };
+                }
+                return node;
+            })
+        );
+    }, [id, setNodes]);
+
+    const onGenerateNode = useCallback(() => {
+        const inputValue = data?.value || 'New Node';
+        if (!inputValue.trim()) {
+            alert('Please enter a name in the List Name field');
+            return;
+        }
+
+        const newNodeId = getId();
+        const currentNode = getNodes().find(n => n.id === id);
+
+        if (!currentNode) return;
+
+        const newNode = {
+            id: newNodeId,
+            type: 'variable-ref',
+            data: { label: inputValue, value: inputValue },
+            position: {
+                x: currentNode.position.x,
+                y: currentNode.position.y + 150
+            }
+        };
+
+        setNodes((nds) => [...nds, newNode]);
+    }, [id, data?.value, getNodes, setNodes]);
+
+
+    return (
+        <div className="variable-node" style={{ display: 'flex', flexDirection: 'column', gap: 6, alignItems: 'center', padding: 8 }}>
+            Variable
+            <input type='text' placeholder='Variable Name' value={data?.value || ''} onChange={onChange} style={{ width: '100px' }} />
+            <LimitHandle type="source" position={Position.Right} id="cond-right-source-handle" style={{ top: '50%' }} className={''} />
+            <button onClick={onGenerateNode} style={{ padding: '2px 6px', fontSize: '12px' }}>Generate Ref</button>
+
+            <LimitHandle type="source" position={Position.Bottom} id="bottom-source-handle" />
+            <LimitHandle type="target" position={Position.Top} id="top-target-handle" />
+        </div>
+    )
+}
+
+export function VariableReferenceNode({ id, data }) {
+    const { setNodes } = useReactFlow();
+    const initNode = findInitialNode({ id, data });
+    useEffect(() => {
+        setNodes((nds) =>
+            nds.map((node) => {
+                if (node.id === id) {
+                    const newData = { ...node.data, initNode: initNode };
+                    return { ...node, data: newData };
+                }
+                return node;
+            }));
+    }, [id, setNodes, initNode]);
+    return (
+        <div className="variable-ref-node" style={{ display: 'flex', flexDirection: 'row', gap: 6, alignItems: 'center', padding: 8 }}>
+            <label style={{ display: 'block', width: '50px', marginRight: 10 }}>{data?.value || 'Variable Reference'}</label>
+            <LimitHandle type="source" position={Position.Right} id="cond-right-source-handle" />
+            <LimitHandle type="target" position={Position.Left} id="cond-left-target-handle" />
         </div>
     )
 }

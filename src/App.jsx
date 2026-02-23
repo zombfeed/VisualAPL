@@ -24,7 +24,10 @@ import {
   ConditionalBuffNode,
   ConditionalCooldownNode,
   PreCombatNode,
-  CustomListNode
+  CustomListNode,
+  CustomListReferenceNode,
+  VariableNode,
+  VariableReferenceNode
 } from './nodes';
 
 import Sidebar from './Sidebar';
@@ -43,6 +46,9 @@ export const nodeTypes = {
   'conditional-gate': ConditionalGateNode,
   'conditional-cooldown': ConditionalCooldownNode,
   'conditional-buff': ConditionalBuffNode,
+  'customlist-ref': CustomListReferenceNode,
+  'variable': VariableNode,
+  'variable-ref': VariableReferenceNode,
 };
 
 let id = 0;

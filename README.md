@@ -3,15 +3,18 @@ A web based visual scripting tool for writing World of Warcraft "Action Priority
 
 This project uses a React + Vite and React Flow in java script.
 
-## TODO
-- More class/spec support
-- Conditional blocks (STARTED)
-- Auto-alignments
-- Upload existing apls to visual (probably uploading plaintext)
-- Instead of saving file, display plaintext APL for copy/pasting
-- Sup-list support
+## Motivation
+World of Warcraft APLs are generally hand written by theory crafters as plain text. To the lay-person, APLs are hard to read and can be awkward to visualize.
 
-## Maybes
-- Move class/spec selector out of the node structure and use as a "canvas" selector
-- context menus for adding nodes based on selected class/spec canvas?
-- sidebar based on class / spec, generate nodes based on class/spec and display them in the side bar for drag/drop instead of using a generic "ability" node
+### Goal
+The goal of VisualAPL is to provide a more visual interface for writing and reading these APLs.
+
+## Quick Start
+...
+
+## Usage
+...
+
+## Contributing
+Contribute by forking the repo and opening pull requests.
+All pull requests should be submitted to the main branch.

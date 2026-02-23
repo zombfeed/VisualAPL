@@ -62,9 +62,19 @@ function buildAPL(data, edges, listName = '') {
         for (var i = 0; i < edges[edge].length; i++) {
             var target = edges[edge][i];
             if (data[edge].type === listName) {
-                if (data[target].type === 'ability') {
+                if (data[target]?.type.includes('clist-reference')) {
+                    apl += addListReference(abilityList, data, edges, target, idx);
+                }
+                else if (data[target]?.type === 'variable') {
+                    apl += addVariable(abilityList, data, edges, target, idx);
+                }
+                else if (data[target]?.type === 'ability') {
                     apl += addAbility(abilityList, data, edges, target, idx);
                 }
+            } else if (data[target]?.type.includes('clist-reference')) {
+                apl += addListReference(abilityList, data, edges, target, idx);
+            } else if (data[target]?.type === 'variable') {
+                apl += addVariable(abilityList, data, edges, target, idx);
             } else if (data[target]?.type === 'ability') {
                 apl += addAbility(abilityList, data, edges, target, idx);
             }
@@ -101,6 +111,35 @@ function addAbility(abilityList, data, edges, target, idx) {
     return `${apl}\n`;
 }
 
+function addListReference(abilityList, data, edges, target, idx) {
+    var apl = '';
+    var action = data[target].data.hasConditionals ?  'run_action_list' : 'call_action_list';
+
+    if (idx === 0) {
+        apl = `${abilityList}=${action},name=${data[target].data.value.replaceAll(' ', '_')}`;
+    }
+    else {
+        apl = `${abilityList}+=/${action},name=${data[target].data.value.replaceAll(' ', '_')}`;
+    }
+    if (data[target].data.hasConditionals === true) {
+        apl += `,if=`;
+        apl += `${constructConditionalString(null, target, data, edges)}`;
+    }
+    return `${apl}\n`;
+};
+
+function addVariable(abilityList, data, edges, target, idx) {
+    var apl = '';
+    if (idx === 0) {
+        apl = `${abilityList}=variable,name=${data[target].data.value.replaceAll(' ', '_')}`;
+    }
+    else {
+        apl = `${abilityList}+=/variable,name=${data[target].data.value.replaceAll(' ', '_')}`;
+    }
+    apl += `,value=${constructConditionalString(null, target, data, edges)}`;
+    return `${apl}\n`;
+}
+
 export function convertToAPL(flow) {
     var apl = ""
     var precombat_data = {};
@@ -117,6 +156,7 @@ export function convertToAPL(flow) {
                 return [key, value];
             }))
         };
+        console.log(nodeData);
         if (flow.nodes[i].data.initNode === 'precombat' || flow.nodes[i].type === 'precombat') {
             precombat_data[flow.nodes[i].id] = nodeData;
         } else if (flow.nodes[i].data.initNode === 'apl-start' || flow.nodes[i].type === 'apl-start') {
@@ -138,7 +178,7 @@ export function convertToAPL(flow) {
     var pcedges = {};
     var aplstartedges = {};
     var customedges = {};
-    
+
     for (i = 0; i < flow.edges.length; i++) {
         if (flow.edges[i].source in precombat_data) {
             addEdge(pcedges, flow, precombat_data, i);
@@ -147,7 +187,7 @@ export function convertToAPL(flow) {
         } else {
             for (const clist in custom_list_data) {
                 if (flow.edges[i].source in custom_list_data[clist]) {
-                    if (!(clist in customedges)){
+                    if (!(clist in customedges)) {
                         customedges[clist] = {};
                     }
                     addEdge(customedges[clist], flow, custom_list_data[clist], i);
@@ -158,7 +198,7 @@ export function convertToAPL(flow) {
     }
     apl += buildAPL(precombat_data, pcedges, 'precombat');
     apl += buildAPL(apl_start_data, aplstartedges);
-    for( const clist in custom_list_data){
+    for (const clist in custom_list_data) {
         apl += buildAPL(custom_list_data[clist], customedges[clist], clist);
     }
 

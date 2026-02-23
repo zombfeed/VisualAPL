@@ -96,6 +96,9 @@ export default function Sidebar() {
       <div className='dndnode input' onDragStart={(event) => onDragStart(event, 'customstart')} draggable>
         Custom List
       </div>
+      <div className="dndnode input" onDragStart={(event) => onDragStart(event, "variable")} draggable>
+        Variable
+      </div>
       <div className="dndnode" onDragStart={(event) => onDragStart(event, 'ability')} draggable>
         Ability Node
       </div>
@@ -108,6 +111,7 @@ export default function Sidebar() {
       <div className="dndnode" onDragStart={(event) => onDragStart(event, "conditional-gate")} draggable>
         Logic Group
       </div>
+
     </aside>
   );
 };
