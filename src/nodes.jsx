@@ -407,11 +407,12 @@ export function ConditionalGateNode({ id, data }) {
     const initial = data?.operator || 'AND';
     const [operator, setOperator] = useState(initial);
     const updateNodeInternals = useUpdateNodeInternals();
-
+    const initNode = findInitialNode({ id, data });
+   
     useEffect(() => {
         setNodes((nds) => nds.map((node) => {
             if (node.id === id) {
-                return { ...node, data: { ...node.data, operator } };
+                return { ...node, data: { ...node.data, operator, initNode } };
             }
             return node;
         }));
@@ -420,7 +421,7 @@ export function ConditionalGateNode({ id, data }) {
                 return !(e.source === id && e.sourceHandle === `cond-right-source-handle-2`);
             }));
         }
-    }, [operator, id, setNodes, setEdges]);
+    }, [operator, id, setNodes, setEdges, initNode]);
 
     const handleChange = (event) => {
         setOperator(event.target.value || 'AND');

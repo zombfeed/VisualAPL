@@ -65,7 +65,7 @@ function buildAPL(data, edges, listName = '') {
                 if (data[target].type === 'ability') {
                     apl += addAbility(abilityList, data, edges, target, idx);
                 }
-            } else if (data[target].type === 'ability') {
+            } else if (data[target]?.type === 'ability') {
                 apl += addAbility(abilityList, data, edges, target, idx);
             }
         }
@@ -107,7 +107,6 @@ export function convertToAPL(flow) {
     var apl_start_data = {};
     var custom_list_data = {};
 
-    // Split nodes based on initial node type
     for (var i = 0; i < flow.nodes.length; i++) {
         const nodeData = {
             'type': flow.nodes[i].type,
@@ -139,7 +138,7 @@ export function convertToAPL(flow) {
     var pcedges = {};
     var aplstartedges = {};
     var customedges = {};
-
+    
     for (i = 0; i < flow.edges.length; i++) {
         if (flow.edges[i].source in precombat_data) {
             addEdge(pcedges, flow, precombat_data, i);
