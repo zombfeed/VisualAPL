@@ -22,16 +22,20 @@ export function constructConditionalString(prevNode, currentNode, nodeData, edge
     const isNot = operator === 'not';
     let operatorSymbol = operator === 'and' ? '&' : operator === 'or' ? '|' : '';
     if (nodeData[currentNode].type.includes('gate')) {
-        if (prevNode !== null && nodeData[prevNode].type.includes('cond') && nodeData[prevNode].data.operator !== "not" && !isNot) cond += '&';
         if (isNot) cond += '!';
         let top = edges[currentNode][0];
         let bottom = edges[currentNode][1];
+
+        if (isNot && !nodeData[top]?.type.includes('gate')) {
+            cond += '(';
+        }
 
         if (prevNode !== null && (nodeData[prevNode].type.includes('cond'))) cond += '(';
         if (top && nodeData[top]?.type.includes('cond')) {
             cond += buildConditionString(nodeData[top]);
             cond += constructConditionalString(currentNode, top, nodeData, edges);
         }
+
         if (bottom && nodeData[bottom]?.type.includes('cond')) {
             cond += operatorSymbol;
             cond += buildConditionString(nodeData[bottom]);
@@ -54,48 +58,6 @@ export function constructConditionalString(prevNode, currentNode, nodeData, edge
     return cond;
 }
 
-function buildAPL(data, edges, listName = '') {
-    var apl = '';
-    var abilityList = listName !== '' ? `actions.${listName}` : 'actions';
-    var idx = 0;
-    for (const edge in edges) {
-        for (var i = 0; i < edges[edge].length; i++) {
-            var target = edges[edge][i];
-            if (data[edge].type === listName) {
-                if (data[target]?.type.includes('clist-reference')) {
-                    apl += addListReference(abilityList, data, edges, target, idx);
-                }
-                else if (data[target]?.type === 'variable') {
-                    apl += addVariable(abilityList, data, edges, target, idx);
-                }
-                else if (data[target]?.type === 'ability') {
-                    apl += addAbility(abilityList, data, edges, target, idx);
-                }
-            } else if (data[target]?.type.includes('clist-reference')) {
-                apl += addListReference(abilityList, data, edges, target, idx);
-            } else if (data[target]?.type === 'variable') {
-                apl += addVariable(abilityList, data, edges, target, idx);
-            } else if (data[target]?.type === 'ability') {
-                apl += addAbility(abilityList, data, edges, target, idx);
-            }
-        }
-        idx++;
-
-    }
-    if (apl === '') return '';
-    apl += '\n\n';
-    return apl;
-}
-
-function addEdge(dict, flow, data, idx) {
-    if (flow.edges[idx].source in data) {
-        if (!dict[flow.edges[idx].source]) {
-            dict[flow.edges[idx].source] = [];
-        }
-        dict[flow.edges[idx].source].push(flow.edges[idx].target);
-    }
-}
-
 function addAbility(abilityList, data, edges, target, idx) {
     var apl = '';
     if (idx === 0) {
@@ -113,7 +75,7 @@ function addAbility(abilityList, data, edges, target, idx) {
 
 function addListReference(abilityList, data, edges, target, idx) {
     var apl = '';
-    var action = data[target].data.hasConditionals ?  'run_action_list' : 'call_action_list';
+    var action = data[target].data.hasConditionals ? 'run_action_list' : 'call_action_list';
 
     if (idx === 0) {
         apl = `${abilityList}=${action},name=${data[target].data.value.replaceAll(' ', '_')}`;
@@ -138,6 +100,48 @@ function addVariable(abilityList, data, edges, target, idx) {
     }
     apl += `,value=${constructConditionalString(null, target, data, edges)}`;
     return `${apl}\n`;
+}
+
+function buildAPL(data, edges, listName = '') {
+    var apl = '';
+    var abilityList = listName !== '' ? `actions.${listName}` : 'actions';
+
+    function addToAPL(index) {
+        if (data[target]?.type.includes('customlist-ref')) {
+            apl += addListReference(abilityList, data, edges, target, index);
+        }
+        else if (data[target]?.type === 'variable') {
+            apl += addVariable(abilityList, data, edges, target, index);
+        }
+        else if (data[target]?.type === 'ability') {
+            apl += addAbility(abilityList, data, edges, target, index);
+        }
+    }
+
+    var idx = 0;
+    for (const edge in edges) {
+        for (var i = 0; i < edges[edge].length; i++) {
+            var target = edges[edge][i];
+            if (data[edge].type === listName) {
+                addToAPL(idx)
+            } else {
+                addToAPL(idx)
+            }
+        }
+        idx++;
+    }
+    if (apl === '') return '';
+
+    return apl;
+}
+
+function addEdge(dict, flow, data, idx) {
+    if (flow.edges[idx].source in data) {
+        if (!dict[flow.edges[idx].source]) {
+            dict[flow.edges[idx].source] = [];
+        }
+        dict[flow.edges[idx].source].push(flow.edges[idx].target);
+    }
 }
 
 export function convertToAPL(flow) {

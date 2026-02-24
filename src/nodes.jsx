@@ -5,7 +5,7 @@ import LimitHandle from './handles.jsx';
 import { getId } from './App.jsx';
 
 const iconURL = '/VisualAPL/SpellIcons';
-const excludeTypes = [
+export const excludeTypes = [
     'conditional-cooldown',
     'ability',
     'conditional-buff',
@@ -64,7 +64,7 @@ export function AbilityNode({ id, data }) {
         setNodes((nds) =>
             nds.map((node) => {
                 if (node.id === id) {
-                    const newData = { ...node.data, hasConditionals: checked };
+                    const newData = { ...node.data, hasConditionals: checked, type: 'ability' };
                     return { ...node, data: newData };
                 }
                 return node;
@@ -92,6 +92,7 @@ export function AbilityNode({ id, data }) {
             setSelectedImage(event.target.value || '');
             setSelectedName('');
         }
+        updateNodeInternals(id);
     };
 
     const initNode = findInitialNode({ id, data });
@@ -181,6 +182,8 @@ export function ConditionalCooldownNode({ id, data }) {
     const [selectedName, setSelectedName] = useState(data?.abilityName || '');
     const [selectedTypes, setSelectedTypes] = useState(data?.types || '');
 
+    const updateNodeInternals = useUpdateNodeInternals();
+
     useEffect(() => {
         try {
             setImages(Array.isArray(abilitiesJson) ? abilitiesJson : []);
@@ -200,6 +203,7 @@ export function ConditionalCooldownNode({ id, data }) {
             setSelectedImage(event.target.value || '');
             setSelectedName('');
         }
+        updateNodeInternals(id);
     };
 
     const initNode = findInitialNode({ id, data });
@@ -207,7 +211,7 @@ export function ConditionalCooldownNode({ id, data }) {
         setNodes((nds) =>
             nds.map((node) => {
                 if (node.id === id) {
-                    const newData = { ...node.data, abilityName: selectedName, types: selectedTypes, initNode: initNode };
+                    const newData = { ...node.data, type: 'conditional-cooldown', abilityName: selectedName, types: selectedTypes, initNode: initNode };
                     return { ...node, data: newData };
                 }
                 return node;
@@ -296,6 +300,7 @@ export function ConditionalBuffNode({ id, data }) {
     const [selectedImage, setSelectedImage] = useState(data?.imageUrl || '');
     const [selectedName, setSelectedName] = useState(data?.abilityName || '');
     const [selectedTypes, setSelectedTypes] = useState(data?.types || '');
+    const updateNodeInternals = useUpdateNodeInternals();
 
     useEffect(() => {
         try {
@@ -316,6 +321,7 @@ export function ConditionalBuffNode({ id, data }) {
             setSelectedImage(event.target.value || '');
             setSelectedName('');
         }
+        updateNodeInternals(id);
     };
 
     const initNode = findInitialNode({ id, data });
@@ -323,7 +329,7 @@ export function ConditionalBuffNode({ id, data }) {
         setNodes((nds) =>
             nds.map((node) => {
                 if (node.id === id) {
-                    const newData = { ...node.data, abilityName: selectedName, types: selectedTypes, initNode: initNode };
+                    const newData = { ...node.data, type: 'conditional-buff', abilityName: selectedName, types: selectedTypes, initNode: initNode };
                     return { ...node, data: newData };
                 }
                 return node;
@@ -416,7 +422,7 @@ export function ConditionalGateNode({ id, data }) {
     useEffect(() => {
         setNodes((nds) => nds.map((node) => {
             if (node.id === id) {
-                return { ...node, data: { ...node.data, operator, initNode } };
+                return { ...node, data: { ...node.data, type: 'conditional-gate', operator, initNode } };
             }
             return node;
         }));
@@ -429,7 +435,6 @@ export function ConditionalGateNode({ id, data }) {
 
     const handleChange = (event) => {
         setOperator(event.target.value || 'AND');
-
         updateNodeInternals(id);
     };
 
@@ -570,7 +575,7 @@ export function CustomListReferenceNode({ id, data }) {
                 </label>
             </div>
             <LimitHandle type="source" position={Position.Right} id="cond-right-source-handle" style={{ top: '50%' }} className={!data.hasConditionals ? 'handle-hidden' : ''} />
-            <LimitHandle type="source" position={Position.Bottom} id="top-source-handle" />
+            <LimitHandle type="source" position={Position.Bottom} id="bottom-source-handle" />
             <LimitHandle type="target" position={Position.Top} id="top-target-handle" />
         </div>
     )

@@ -13,6 +13,7 @@ import {
   getIncomers,
   getOutgoers,
 } from '@xyflow/react';
+import { excludeTypes } from './nodes';
 
 import '@xyflow/react/dist/style.css';
 
@@ -140,7 +141,7 @@ function DnDFlow() {
   const [type, setType] = useDnD();
   const edgeReconnectSuccessful = useRef(true);
 
-  const onConnect = useCallback((params) => setEdges((eds) => addEdge(params, eds)), [setEdges]);
+  const onConnect = useCallback((params) => setEdges((edge) => addEdge(params, edge)), [setEdges]);
   const onConnectEnd = useCallback((event, connectionState) => {
     if (!connectionState.isValid) {
       const id = getId();
@@ -153,14 +154,16 @@ function DnDFlow() {
           position: screenToFlowPosition({ x: clientX - 175, y: clientY }),
           data: { label: 'Ability', abilityName: 'Ability', hasConditionals: false, types: [] },
         };
+        setNodes((node) => node.concat(newNode));
+        const targetHandle = 'top-target-handle'
+        const params = { source: connectionState.fromNode.id, sourceHandle: connectionState.fromHandle.id, target: id, targetHandle: targetHandle}
+        setEdges((edge) => addEdge(params, edge));
       }
       else {
         return;
       }
-      setNodes((nds) => nds.concat(newNode));
-      setEdges((eds) => eds.concat({ id, source: connectionState.fromNode.id, sourceHandle: connectionState.fromHandle.id, target: id }));
     }
-  }, [screenToFlowPosition]);
+  }, [screenToFlowPosition, setEdges, setNodes]);
 
   const onReconnectStart = useCallback(() => {
     edgeReconnectSuccessful.current = false;
@@ -168,15 +171,15 @@ function DnDFlow() {
 
   const onReconnect = useCallback((oldEdge, newConnection) => {
     edgeReconnectSuccessful.current = true;
-    setEdges((eds) => reconnectEdge(oldEdge, newConnection, eds));
-  });
+    setEdges((edge) => reconnectEdge(oldEdge, newConnection, edge));
+  }, [setEdges]);
 
   const onReconnectEnd = useCallback((_, edge) => {
     if (!edgeReconnectSuccessful.current) {
       setEdges((eds) => eds.filter((e) => e.id !== edge.id));
     }
     edgeReconnectSuccessful.current = true;
-  }, []);
+  }, [setEdges]);
 
 
   const onDragOver = useCallback((event) => {
@@ -203,9 +206,9 @@ function DnDFlow() {
         data: { label: `${type} node` },
       };
 
-      setNodes((nds) => nds.concat(newNode));
+      setNodes((node) => node.concat(newNode));
     },
-    [screenToFlowPosition, type],
+    [screenToFlowPosition, type, setNodes],
   );
 
   const onDragStart = (event, nodeType) => {
@@ -214,11 +217,53 @@ function DnDFlow() {
     event.dataTransfer.effectAllowed = 'move';
   };
 
+  const reorderEdges = (flow) => {
+    if (!flow || !flow.nodes || !flow.edges) return flow;
+    
+    const startNode = flow.nodes.find(n => n.type === 'apl-start');
+    if (!startNode) return flow;
+    
+    const reorderedEdges = [];
+    const visitedNodes = new Set([startNode.id]);
+    const queue = [startNode.id];
+    
+    while (queue.length > 0) {
+      const currentNodeId = queue.shift();
+      
+      const edgesFromCurrent = flow.edges.filter(e => e.source === currentNodeId);
+      edgesFromCurrent.forEach(edge => {
+        reorderedEdges.push(edge);
+        if (!visitedNodes.has(edge.target)) {
+          visitedNodes.add(edge.target);
+          queue.push(edge.target);
+        }
+      });
+    }
+    
+    const addedEdgeIds = new Set(reorderedEdges.map(e => e.id));
+    const remainingEdges = flow.edges.filter(edge => !addedEdgeIds.has(edge.id));
+    
+    const customListEdges = remainingEdges.filter(edge => {
+      const sourceNode = flow.nodes.find(n => n.id === edge.source);
+      const targetNode = flow.nodes.find(n => n.id === edge.target);
+      return !excludeTypes.includes(sourceNode?.type)|| !excludeTypes.includes(targetNode?.type);
+    });
+    
+    const otherEdges = remainingEdges.filter(edge => {
+      const sourceNode = flow.nodes.find(n => n.id === edge.source);
+      const targetNode = flow.nodes.find(n => n.id === edge.target);
+      return excludeTypes.includes(sourceNode?.type) && excludeTypes.includes(targetNode?.type);
+    });
+    
+    flow.edges = [...reorderedEdges, ...customListEdges, ...otherEdges];
+    return flow;
+  }
+
   const onExport = useCallback(() => {
     if (APLInstance) {
       const flow = APLInstance.toObject();
-
-      const aplfile = convertToAPL(flow);
+      const reorderedFlow = reorderEdges(flow);
+      const aplfile = convertToAPL(reorderedFlow);
       localStorage.setItem(APLKey, aplfile);
 
       const blob = new Blob([aplfile], { type: 'text/plain' });
@@ -237,12 +282,12 @@ function DnDFlow() {
   const onNodesDelete = useCallback((deleted) => {
     if (!deleted || deleted.length === 0) return;
 
-    setEdges((eds) => {
-      let nextEdges = eds.filter((e) => !deleted.some((n) => n.id === e.source || n.id === e.target));
+    setEdges((edge) => {
+      let nextEdges = edge.filter((e) => !deleted.some((n) => n.id === e.source || n.id === e.target));
 
       deleted.forEach((node) => {
-        const incomers = getIncomers(node, nodes, eds);
-        const outgoers = getOutgoers(node, nodes, eds);
+        const incomers = getIncomers(node, nodes, edge);
+        const outgoers = getOutgoers(node, nodes, edge);
 
         incomers.forEach((inc) => {
           outgoers.forEach((out) => {
@@ -258,7 +303,7 @@ function DnDFlow() {
       return nextEdges;
     });
 
-    setNodes((nds) => nds.filter((n) => !deleted.some((d) => d.id === n.id)));
+    setNodes((node) => node.filter((n) => !deleted.some((d) => d.id === n.id)));
   }, [nodes, setNodes, setEdges]);
 
   useEffect(() => {
