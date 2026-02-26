@@ -6,54 +6,21 @@ import {
   addEdge,
   useNodesState,
   useEdgesState,
-  Controls,
   useReactFlow,
   Background,
   Panel,
   getIncomers,
   getOutgoers,
 } from '@xyflow/react';
-import { excludeTypes } from './nodes';
-
 import '@xyflow/react/dist/style.css';
-
-import {
-  AbilityNode,
-  APLStartNode,
-  APLEndNode,
-  ConditionalGateNode,
-  ConditionalBuffNode,
-  ConditionalCooldownNode,
-  PreCombatNode,
-  CustomListNode,
-  CustomListReferenceNode,
-  VariableNode,
-  VariableReferenceNode
-} from './nodes';
-
 import Sidebar from './Sidebar';
-import { DnDProvider, useDnD } from './DnDContext';
+import { DnDProvider } from './DnDContext';
 import { convertToAPL } from './aplconverter';
+import { getId, useDnD, nodeTypes, excludeTypes  } from './frexports';
 
 const MIN_DISTANCE = 150;
 
 const APLKey = 'apl-flow';
-export const nodeTypes = {
-  default: CustomListNode,
-  'precombat': PreCombatNode,
-  'apl-start': APLStartNode,
-  'apl-end': APLEndNode,
-  'ability': AbilityNode,
-  'conditional-gate': ConditionalGateNode,
-  'conditional-cooldown': ConditionalCooldownNode,
-  'conditional-buff': ConditionalBuffNode,
-  'customlist-ref': CustomListReferenceNode,
-  'variable': VariableNode,
-  'variable-ref': VariableReferenceNode,
-};
-
-let id = 0;
-export const getId = () => `dndnode_${id++}`;
 
 const initialNodes = [
   {
@@ -156,7 +123,7 @@ function DnDFlow() {
         };
         setNodes((node) => node.concat(newNode));
         const targetHandle = 'top-target-handle'
-        const params = { source: connectionState.fromNode.id, sourceHandle: connectionState.fromHandle.id, target: id, targetHandle: targetHandle}
+        const params = { source: connectionState.fromNode.id, sourceHandle: connectionState.fromHandle.id, target: id, targetHandle: targetHandle }
         setEdges((edge) => addEdge(params, edge));
       }
       else {
@@ -219,17 +186,17 @@ function DnDFlow() {
 
   const reorderEdges = (flow) => {
     if (!flow || !flow.nodes || !flow.edges) return flow;
-    
+
     const startNode = flow.nodes.find(n => n.type === 'apl-start');
     if (!startNode) return flow;
-    
+
     const reorderedEdges = [];
     const visitedNodes = new Set([startNode.id]);
     const queue = [startNode.id];
-    
+
     while (queue.length > 0) {
       const currentNodeId = queue.shift();
-      
+
       const edgesFromCurrent = flow.edges.filter(e => e.source === currentNodeId);
       edgesFromCurrent.forEach(edge => {
         reorderedEdges.push(edge);
@@ -239,22 +206,22 @@ function DnDFlow() {
         }
       });
     }
-    
+
     const addedEdgeIds = new Set(reorderedEdges.map(e => e.id));
     const remainingEdges = flow.edges.filter(edge => !addedEdgeIds.has(edge.id));
-    
+
     const customListEdges = remainingEdges.filter(edge => {
       const sourceNode = flow.nodes.find(n => n.id === edge.source);
       const targetNode = flow.nodes.find(n => n.id === edge.target);
-      return !excludeTypes.includes(sourceNode?.type)|| !excludeTypes.includes(targetNode?.type);
+      return !excludeTypes.includes(sourceNode?.type) || !excludeTypes.includes(targetNode?.type);
     });
-    
+
     const otherEdges = remainingEdges.filter(edge => {
       const sourceNode = flow.nodes.find(n => n.id === edge.source);
       const targetNode = flow.nodes.find(n => n.id === edge.target);
       return excludeTypes.includes(sourceNode?.type) && excludeTypes.includes(targetNode?.type);
     });
-    
+
     flow.edges = [...reorderedEdges, ...customListEdges, ...otherEdges];
     return flow;
   }

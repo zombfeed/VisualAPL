@@ -1,4 +1,4 @@
-import { nodeTypes } from './App.jsx';
+import { nodeTypes } from './frexports';
 
 
 function buildConditionString(nodeData) {

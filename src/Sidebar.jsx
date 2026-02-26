@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useDnD } from './DnDContext';
+import { useDnD } from './frexports';
 import abilitiesJson from '../public/SpellIcons/abilities.json';
 
 export default function Sidebar() {
@@ -12,21 +12,21 @@ export default function Sidebar() {
   const [heroName, setHeroName] = useState('');
   useEffect(() => {
     try {
-      const json = Array.isArray(abilitiesJson) ? abilitiesJson : [];
-      const specs = {};
-      const htalents = {};
-      const cls = [];
-      const excludedKeys = ['Abilities', 'HeroTalents'];
-      for (const entry of json) {
-        const keys = Object.keys(entry);
-        if (!keys.length) continue;
-        const c = keys[0];
-        htalents[c] = Object.keys(entry[c].HeroTalents || {});
-        specs[c] = Object.keys(entry[c] || {}).filter(key => {
-          return !excludedKeys.includes(key);
-        });;
-        cls.push(c);
-      }
+    const json = Array.isArray(abilitiesJson) ? abilitiesJson : [];
+    const specs = {};
+    const htalents = {};
+    const cls = [];
+    const excludedKeys = ['Abilities', 'HeroTalents'];
+    for (const entry of json) {
+      const keys = Object.keys(entry);
+      if (!keys.length) continue;
+      const c = keys[0];
+      htalents[c] = Object.keys(entry[c].HeroTalents || {});
+      specs[c] = Object.keys(entry[c] || {}).filter(key => {
+        return !excludedKeys.includes(key);
+      });;
+      cls.push(c);
+    }
 
       setHeroTalents(htalents);
       setClassSpecs(specs);

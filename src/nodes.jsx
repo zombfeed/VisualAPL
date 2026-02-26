@@ -1,21 +1,12 @@
 import { Position, Handle, useReactFlow, useUpdateNodeInternals } from '@xyflow/react';
 import { useEffect, useState, useCallback } from 'react';
 import abilitiesJson from '../public/SpellIcons/abilities.json';
-import LimitHandle from './handles.jsx';
-import { getId } from './App.jsx';
+import LimitHandle from './handles';
+import { getId, excludeTypes } from './frexports';
 
 const iconURL = '/VisualAPL/SpellIcons';
-export const excludeTypes = [
-    'conditional-cooldown',
-    'ability',
-    'conditional-buff',
-    'conditional-gate',
-    'apl-end',
-    'customlist-ref',
-    'variable',
-    'variable-ref'
-];
-function findInitialNode({ id, data }) {
+
+function FindInitialNode({ id }) {
     const { getNodes, getEdges } = useReactFlow();
     const nodesAll = typeof getNodes === 'function' ? getNodes() : [];
     const edgesAll = typeof getEdges === 'function' ? getEdges() : [];
@@ -96,7 +87,7 @@ export function AbilityNode({ id, data }) {
     };
 
 
-    const initNode = findInitialNode({ id, data });
+    const initNode = FindInitialNode({ id, data });
     useEffect(() => {
         setNodes((nds) =>
             nds.map((node) => {
@@ -186,7 +177,7 @@ function CondionalNodeSetup(
 ) {
 
     const updateNodeInternals = useUpdateNodeInternals();
-    const initNode = findInitialNode({ id, data });
+    const initNode = FindInitialNode({ id, data });
 
     const toggleReady = (event) => {
         const checked = event.target.checked;
@@ -368,7 +359,7 @@ export function ConditionalGateNode({ id, data }) {
     const initial = data?.operator || 'AND';
     const [operator, setOperator] = useState(initial);
     const updateNodeInternals = useUpdateNodeInternals();
-    const initNode = findInitialNode({ id, data });
+    const initNode = FindInitialNode({ id, data });
 
     useEffect(() => {
         setNodes((nds) => nds.map((node) => {
@@ -504,7 +495,7 @@ export function CustomListReferenceNode({ id, data }) {
         updateNodeInternals(id);
     };
 
-    const initNode = findInitialNode({ id, data });
+    const initNode = FindInitialNode({ id, data });
     useEffect(() => {
         setNodes((nds) =>
             nds.map((node) => {
@@ -534,7 +525,7 @@ export function CustomListReferenceNode({ id, data }) {
 
 export function VariableNode({ id, data }) {
     const { setNodes, getNodes } = useReactFlow();
-    const initNode = findInitialNode({ id, data });
+    const initNode = FindInitialNode({ id, data });
 
     useEffect(() => {
         setNodes((nds) =>
@@ -600,7 +591,7 @@ export function VariableNode({ id, data }) {
 
 export function VariableReferenceNode({ id, data }) {
     const { setNodes } = useReactFlow();
-    const initNode = findInitialNode({ id, data });
+    const initNode = FindInitialNode({ id, data });
     useEffect(() => {
         setNodes((nds) =>
             nds.map((node) => {

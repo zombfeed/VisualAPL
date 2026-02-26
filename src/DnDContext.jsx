@@ -1,19 +1,15 @@
-import { createContext, useContext, useState } from 'react';
- 
-const DnDContext = createContext([null, (_) => {}]);
- 
+import { useState } from 'react';
+import { DnDContext } from './frexports';
+
+
 export const DnDProvider = ({ children }) => {
   const [type, setType] = useState(null);
- 
+
   return (
     <DnDContext.Provider value={[type, setType]}>
       {children}
     </DnDContext.Provider>
   );
 }
- 
-export default DnDContext;
- 
-export const useDnD = () => {
-  return useContext(DnDContext);
-}
+
+
