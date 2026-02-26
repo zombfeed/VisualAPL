@@ -64,7 +64,7 @@ export function AbilityNode({ id, data }) {
         setNodes((nds) =>
             nds.map((node) => {
                 if (node.id === id) {
-                    const newData = { ...node.data, hasConditionals: checked, type: 'ability' };
+                    const newData = { ...node.data, hasConditionals: checked };
                     return { ...node, data: newData };
                 }
                 return node;
@@ -95,12 +95,13 @@ export function AbilityNode({ id, data }) {
         updateNodeInternals(id);
     };
 
+
     const initNode = findInitialNode({ id, data });
     useEffect(() => {
         setNodes((nds) =>
             nds.map((node) => {
                 if (node.id === id) {
-                    const newData = { ...node.data, abilityName: selectedName, types: selectedTypes, initNode: initNode };
+                    const newData = { ...node.data, abilityName: selectedName, types: selectedTypes, initNode: initNode, type: 'ability' };
                     return { ...node, data: newData };
                 }
                 return node;
@@ -175,23 +176,31 @@ export function AbilityNode({ id, data }) {
     );
 }
 
-export function ConditionalCooldownNode({ id, data }) {
-    const { setNodes } = useReactFlow();
-    const [imagesJson, setImages] = useState([]);
-    const [selectedImage, setSelectedImage] = useState(data?.imageUrl || '');
-    const [selectedName, setSelectedName] = useState(data?.abilityName || '');
-    const [selectedTypes, setSelectedTypes] = useState(data?.types || '');
+function CondionalNodeSetup(
+    { id, data },
+    setNodes,
+    imagesJson, setImages,
+    selectedImage, setSelectedImage,
+    selectedName, setSelectedName,
+    selectedTypes, setSelectedTypes,
+) {
 
     const updateNodeInternals = useUpdateNodeInternals();
+    const initNode = findInitialNode({ id, data });
 
-    useEffect(() => {
-        try {
-            setImages(Array.isArray(abilitiesJson) ? abilitiesJson : []);
-        } catch (e) {
-            console.log('Error loading abilities.json:', e);
-            setImages([]);
-        }
-    }, []);
+    const toggleReady = (event) => {
+        const checked = event.target.checked;
+        setNodes((nds) =>
+            nds.map((node) => {
+                if (node.id === id) {
+                    const newData = { ...node.data, isReady: checked }
+                    return { ...node, data: newData };
+                }
+                return node;
+            })
+        );
+        updateNodeInternals(id);
+    };
 
     const handleChange = (event) => {
         try {
@@ -205,18 +214,6 @@ export function ConditionalCooldownNode({ id, data }) {
         }
         updateNodeInternals(id);
     };
-
-    const initNode = findInitialNode({ id, data });
-    useEffect(() => {
-        setNodes((nds) =>
-            nds.map((node) => {
-                if (node.id === id) {
-                    const newData = { ...node.data, type: 'conditional-cooldown', abilityName: selectedName, types: selectedTypes, initNode: initNode };
-                    return { ...node, data: newData };
-                }
-                return node;
-            }));
-    }, [selectedImage, selectedName, selectedTypes, id, setNodes, initNode]);
 
     const className = document.getElementById('class-select')?.value || '';
     const specName = document.getElementById('spec-select')?.value || '';
@@ -253,6 +250,10 @@ export function ConditionalCooldownNode({ id, data }) {
 
     const selectedValue = (selectedImage && selectedName) ? JSON.stringify({ url: selectedImage, name: selectedName, types: selectedTypes }) : '';
 
+    return [initNode, options, selectedValue, toggleReady, handleChange]
+}
+
+function ConditionalNodeHTMLSetup(label, data, options, selectedName, selectedValue, selectedImage, handleChange, toggleReady) {
     return (
         <div className="ability-node">
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
@@ -278,8 +279,8 @@ export function ConditionalCooldownNode({ id, data }) {
                                 display: 'flex', flexDirection: 'column', gap: 4, marginLeft: 14, marginRight: 1
                             }}>
                                 <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-                                    Cooldown Available
-                                    <input type="checkbox" label="cooldown" onChange={() => { }} checked={true || false} />
+                                    {label}
+                                    <input id='conditional-checkbox' type="checkbox" label="cooldown" onChange={toggleReady} checked={data.isReady ?? true} />
                                 </div>
                                 <input id="rdur" type="number" name="rdur" placeholder="Remaining Duration" style={{ width: 120 }} />
                                 <input id="stacks" type="number" name="stacks" placeholder="Stack Count" style={{ width: 120 }} />
@@ -294,13 +295,15 @@ export function ConditionalCooldownNode({ id, data }) {
     );
 }
 
-export function ConditionalBuffNode({ id, data }) {
+export function ConditionalCooldownNode({ id, data }) {
     const { setNodes } = useReactFlow();
     const [imagesJson, setImages] = useState([]);
     const [selectedImage, setSelectedImage] = useState(data?.imageUrl || '');
     const [selectedName, setSelectedName] = useState(data?.abilityName || '');
     const [selectedTypes, setSelectedTypes] = useState(data?.types || '');
-    const updateNodeInternals = useUpdateNodeInternals();
+
+    const [initNode, options, selectedValue, toggleReady, handleChange] = CondionalNodeSetup({ id, data }, setNodes, imagesJson, setImages, selectedImage, setSelectedImage, selectedName, setSelectedName, selectedTypes, setSelectedTypes)
+
 
     useEffect(() => {
         try {
@@ -311,20 +314,39 @@ export function ConditionalBuffNode({ id, data }) {
         }
     }, []);
 
-    const handleChange = (event) => {
-        try {
-            const parsed = JSON.parse(event.target.value || '{}');
-            setSelectedImage(parsed.url || '');
-            setSelectedName(parsed.name || '');
-            setSelectedTypes(parsed.types || '');
-        } catch {
-            setSelectedImage(event.target.value || '');
-            setSelectedName('');
-        }
-        updateNodeInternals(id);
-    };
+    useEffect(() => {
+        setNodes((nds) =>
+            nds.map((node) => {
+                if (node.id === id) {
+                    const newData = { ...node.data, type: 'conditional-cooldown', abilityName: selectedName, types: selectedTypes, initNode: initNode };
+                    return { ...node, data: newData };
+                }
+                return node;
+            }));
+    }, [selectedImage, selectedName, selectedTypes, id, setNodes, initNode]);
 
-    const initNode = findInitialNode({ id, data });
+    return ConditionalNodeHTMLSetup('Cooldown Available', data, options, selectedName, selectedValue, selectedImage, handleChange, toggleReady);
+}
+
+export function ConditionalBuffNode({ id, data }) {
+    const { setNodes } = useReactFlow();
+    const [imagesJson, setImages] = useState([]);
+    const [selectedImage, setSelectedImage] = useState(data?.imageUrl || '');
+    const [selectedName, setSelectedName] = useState(data?.abilityName || '');
+    const [selectedTypes, setSelectedTypes] = useState(data?.types || '');
+
+    const [initNode, options, selectedValue, toggleReady, handleChange] = CondionalNodeSetup({ id, data }, setNodes, imagesJson, setImages, selectedImage, setSelectedImage, selectedName, setSelectedName, selectedTypes, setSelectedTypes)
+
+
+    useEffect(() => {
+        try {
+            setImages(Array.isArray(abilitiesJson) ? abilitiesJson : []);
+        } catch (e) {
+            console.log('Error loading abilities.json:', e);
+            setImages([]);
+        }
+    }, []);
+
     useEffect(() => {
         setNodes((nds) =>
             nds.map((node) => {
@@ -336,80 +358,9 @@ export function ConditionalBuffNode({ id, data }) {
             }));
     }, [selectedImage, selectedName, selectedTypes, id, setNodes, initNode]);
 
-    const className = document.getElementById('class-select')?.value || '';
-    const specName = document.getElementById('spec-select')?.value || '';
-    const heroName = document.getElementById('hero-select')?.value || '';
 
-    let options = [];
-    if (Array.isArray(imagesJson) && imagesJson.length && className && specName && heroName) {
-        for (const entry of imagesJson) {
-            if (entry[className]) {
-                options = entry[className].Abilities.map((it) => {
-                    const fullUrl = it.url?.startsWith(iconURL) ? it.url : `${iconURL}${it.url}`;
-                    return { ...it, url: fullUrl };
-                });
-            }
-            if (entry[className][specName]) {
-                options.push(...entry[className][specName].map((it) => {
-                    const fullUrl = it.url?.startsWith(iconURL) ? it.url : `${iconURL}${it.url}`;
-                    return { ...it, url: fullUrl };
-                }));
-            }
-            if (entry[className].HeroTalents[heroName]) {
-                options.push(...entry[className].HeroTalents[heroName].map((it) => {
-                    const fullUrl = it.url?.startsWith(iconURL) ? it.url : `${iconURL}${it.url}`;
-                    return { ...it, url: fullUrl };
-                }));
-                break;
-            }
-        }
-    }
+    return  ConditionalNodeHTMLSetup('Buff Up', data, options, selectedName, selectedValue, selectedImage, handleChange, toggleReady);
 
-    if (!options.length) {
-        options = data?.options || [];
-    }
-
-    const selectedValue = (selectedImage && selectedName) ? JSON.stringify({ url: selectedImage, name: selectedName, types: selectedTypes }) : '';
-
-    return (
-        <div className="ability-node">
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                <select onChange={handleChange} value={selectedValue} style={{ minWidth: 160 }}>
-                    <option value="">-- select ability --</option>
-                    {options.map((opt) => {
-                        if (!opt.types.includes("buff")) {
-                            return;
-                        }
-                        const value = JSON.stringify({ url: opt.url, name: opt.name, types: opt.types });
-                        return (
-                            <option key={opt.id ?? opt.name} value={value}>{opt.name}</option>
-                        );
-                    })}
-                </select>
-                {selectedImage && (
-                    <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 8 }}>
-                            <img src={selectedImage} alt={selectedName || 'Selected'} style={{ display: 'block', marginTop: '5px', maxWidth: 64 }} />
-                        </div>
-                        <div style={{ display: 'flex', flexDirection: 'row', gap: 8, marginTop: 8 }}>
-                            <div style={{
-                                display: 'flex', flexDirection: 'column', gap: 4, marginLeft: 14, marginRight: 1
-                            }}>
-                                <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-                                    Buff Up
-                                    <input type="checkbox" label="buff" onChange={() => { }} checked={true || false} />
-                                </div>
-                                <input id="rdur" type="number" name="rdur" placeholder="Remaining Duration" style={{ width: 120 }} />
-                                <input id="stacks" type="number" name="stacks" placeholder="Stack Count" style={{ width: 120 }} />
-                            </div>
-                        </div>
-                    </div>
-                )}
-            </div>
-            <LimitHandle type="source" position={Position.Right} id="cond-right-source-handle" />
-            <LimitHandle type="target" position={Position.Left} id="cond-left-target-handle" />
-        </div>
-    );
 }
 
 export function ConditionalGateNode({ id, data }) {
