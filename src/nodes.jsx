@@ -167,15 +167,10 @@ export function AbilityNode({ id, data }) {
     );
 }
 
-function CondionalNodeSetup(
-    { id, data },
-    setNodes,
-    imagesJson, setImages,
-    selectedImage, setSelectedImage,
-    selectedName, setSelectedName,
-    selectedTypes, setSelectedTypes,
-) {
-
+function CondionalNodeSetup({ id, data }, setNodes, imagesJson) {
+    const [selectedImage, setSelectedImage] = useState(data?.imageUrl || '');
+    const [selectedName, setSelectedName] = useState(data?.abilityName || '');
+    const [selectedTypes, setSelectedTypes] = useState(data?.types || '');
     const updateNodeInternals = useUpdateNodeInternals();
     const initNode = FindInitialNode({ id, data });
 
@@ -241,17 +236,18 @@ function CondionalNodeSetup(
 
     const selectedValue = (selectedImage && selectedName) ? JSON.stringify({ url: selectedImage, name: selectedName, types: selectedTypes }) : '';
 
-    return [initNode, options, selectedValue, toggleReady, handleChange]
+    return [initNode, options, selectedValue, selectedImage, selectedName, selectedTypes, toggleReady, handleChange]
 }
 
-function ConditionalNodeHTMLSetup(label, data, options, selectedName, selectedValue, selectedImage, handleChange, toggleReady) {
+function ConditionalNodeHTMLSetup(condType, data, options, selectedName, selectedValue, selectedImage, handleChange, toggleReady) {
     return (
         <div className="ability-node">
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                 <select onChange={handleChange} value={selectedValue} style={{ minWidth: 160 }}>
                     <option value="">-- select ability --</option>
                     {options.map((opt) => {
-                        if (!opt.types.includes("cooldown")) {
+                        const ctype = condType === "cooldown" ? "cooldown" : "buff";
+                        if (!opt.types.includes(ctype)) {
                             return;
                         }
                         const value = JSON.stringify({ url: opt.url, name: opt.name, types: opt.types });
@@ -270,7 +266,7 @@ function ConditionalNodeHTMLSetup(label, data, options, selectedName, selectedVa
                                 display: 'flex', flexDirection: 'column', gap: 4, marginLeft: 14, marginRight: 1
                             }}>
                                 <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-                                    {label}
+                                    {condType === 'cooldown' ? "Cooldown Available" : "Buff Up"}
                                     <input id='conditional-checkbox' type="checkbox" label="cooldown" onChange={toggleReady} checked={data.isReady ?? true} />
                                 </div>
                                 <input id="rdur" type="number" name="rdur" placeholder="Remaining Duration" style={{ width: 120 }} />
@@ -289,11 +285,8 @@ function ConditionalNodeHTMLSetup(label, data, options, selectedName, selectedVa
 export function ConditionalCooldownNode({ id, data }) {
     const { setNodes } = useReactFlow();
     const [imagesJson, setImages] = useState([]);
-    const [selectedImage, setSelectedImage] = useState(data?.imageUrl || '');
-    const [selectedName, setSelectedName] = useState(data?.abilityName || '');
-    const [selectedTypes, setSelectedTypes] = useState(data?.types || '');
 
-    const [initNode, options, selectedValue, toggleReady, handleChange] = CondionalNodeSetup({ id, data }, setNodes, imagesJson, setImages, selectedImage, setSelectedImage, selectedName, setSelectedName, selectedTypes, setSelectedTypes)
+    const [initNode, options, selectedValue, selectedImage, selectedName, selectedTypes, toggleReady, handleChange] = CondionalNodeSetup({ id, data }, setNodes, imagesJson)
 
 
     useEffect(() => {
@@ -316,17 +309,14 @@ export function ConditionalCooldownNode({ id, data }) {
             }));
     }, [selectedImage, selectedName, selectedTypes, id, setNodes, initNode]);
 
-    return ConditionalNodeHTMLSetup('Cooldown Available', data, options, selectedName, selectedValue, selectedImage, handleChange, toggleReady);
+    return ConditionalNodeHTMLSetup('cooldown', data, options, selectedName, selectedValue, selectedImage, handleChange, toggleReady);
 }
 
 export function ConditionalBuffNode({ id, data }) {
     const { setNodes } = useReactFlow();
     const [imagesJson, setImages] = useState([]);
-    const [selectedImage, setSelectedImage] = useState(data?.imageUrl || '');
-    const [selectedName, setSelectedName] = useState(data?.abilityName || '');
-    const [selectedTypes, setSelectedTypes] = useState(data?.types || '');
 
-    const [initNode, options, selectedValue, toggleReady, handleChange] = CondionalNodeSetup({ id, data }, setNodes, imagesJson, setImages, selectedImage, setSelectedImage, selectedName, setSelectedName, selectedTypes, setSelectedTypes)
+    const [initNode, options, selectedValue, selectedImage, selectedName, selectedTypes, toggleReady, handleChange] = CondionalNodeSetup({ id, data }, setNodes, imagesJson)
 
 
     useEffect(() => {
@@ -350,7 +340,7 @@ export function ConditionalBuffNode({ id, data }) {
     }, [selectedImage, selectedName, selectedTypes, id, setNodes, initNode]);
 
 
-    return  ConditionalNodeHTMLSetup('Buff Up', data, options, selectedName, selectedValue, selectedImage, handleChange, toggleReady);
+    return  ConditionalNodeHTMLSetup('buff', data, options, selectedName, selectedValue, selectedImage, handleChange, toggleReady);
 
 }
 
