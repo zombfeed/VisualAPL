@@ -1,17 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useDnD } from './frexports';
 import abilitiesJson from '../src/abilities.json';
 
-export default function Sidebar() {
-  const [_, setType] = useDnD();
-  const [classSpecs, setClassSpecs] = useState({});
-  const [heroTalents, setHeroTalents] = useState({});
-  const [classes, setClasses] = useState([]);
-  const [className, setClassName] = useState('');
-  const [specName, setSpecName] = useState('');
-  const [heroName, setHeroName] = useState('');
-  useEffect(() => {
-    try {
+
+function getClassSpecsHero() {
     const json = Array.isArray(abilitiesJson) ? abilitiesJson : [];
     const specs = {};
     const htalents = {};
@@ -28,22 +20,25 @@ export default function Sidebar() {
       cls.push(c);
     }
 
-      setHeroTalents(htalents);
-      setClassSpecs(specs);
-      setClasses(cls);
-      const defaultClass = cls[0] || '';
-      const defaultSpec = specs[defaultClass] ? specs[defaultClass][0] : '';
-      const defaultHero = htalents[defaultClass] ? htalents[defaultClass][0] : '';
-      setClassName(defaultClass);
-      setSpecName(defaultSpec);
-      setHeroName(defaultHero);
-    } catch (e) {
-      console.error('Error loading abilities.json:', e);
-      setClassSpecs({});
-      setClasses([]);
-      setHeroTalents({});
-    }
-  }, []);
+
+    return {'class': cls, 'spec': specs, 'hero': htalents}
+}
+export default function Sidebar() {
+  const [_, setType] = useDnD();
+  const chs = getClassSpecsHero();
+  const cls = chs.class
+  const spec = chs.spec
+  const hero = chs.hero
+  const defaultClass = cls[0] || '';
+  const defaultSpec = spec[defaultClass] ? spec[defaultClass][0] : '';
+  const defaultHero = hero[defaultClass] ? hero[defaultClass][0] : '';
+
+  const [classSpecs] = useState(spec || {});
+  const [heroTalents] = useState(hero || {});
+  const [classes] = useState(cls || []);
+  const [className, setClassName] = useState(defaultClass || '');
+  const [specName, setSpecName] = useState(defaultSpec || '');
+  const [heroName, setHeroName] = useState(defaultHero || '');
 
   const onClassChange = (e) => {
     const newClass = e.target.value;
