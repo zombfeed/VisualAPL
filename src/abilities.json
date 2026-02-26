@@ -94,13 +94,6 @@
             ],
             "Subtlety": [
                 {
-                    "name": "Slice and Dice",
-                    "types": [
-                        "buff"
-                    ],
-                    "url": "/Rogue/slice_and_dice.png"
-                },
-                {
                     "name": "Shadow Dance",
                     "types": [
                         "buff",

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDnD } from './frexports';
-import abilitiesJson from '../public/SpellIcons/abilities.json';
+import abilitiesJson from '../src/abilities.json';
 
 export default function Sidebar() {
   const [_, setType] = useDnD();

@@ -1,6 +1,6 @@
 import { Position, Handle, useReactFlow, useUpdateNodeInternals } from '@xyflow/react';
 import { useEffect, useState, useCallback } from 'react';
-import abilitiesJson from '../public/SpellIcons/abilities.json';
+import abilitiesJson from '../src/abilities.json';
 import LimitHandle from './handles';
 import { getId, excludeTypes } from './frexports';
 
